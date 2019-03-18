@@ -1,0 +1,291 @@
+{% assign image_column_class = 'triple-size' %}
+{% assign image_size = '2048x' %}
+{% if section.blocks.size == 2 %}
+  {% assign image_column_class = 'halfrow-size' %}
+  {% assign image_size = '1024x' %}
+{% elsif section.blocks.size == 3 %}
+  {% assign image_column_class = '' %}
+  {% assign image_size = '800x' %}
+{% endif %}
+
+<div class="spacey-row section-id-{{ section.id }}" data-section-type="custom-row">
+  {% if section.settings.title != blank or section.settings.subheading != blank %}
+    <div class="spacey-row">
+      {% if section.settings.title != blank %}
+        <h2 class="h1 align-center {% if section.settings.subheading != blank %}light-inner-row{% endif %}">{{ section.settings.title }}</h2>
+      {% endif %}
+
+      {% if section.settings.subheading != blank %}
+        <div class="align-center">{{ section.settings.subheading }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="three-block-layout cf">
+    {% for block in section.blocks %}
+    <div class="col-block {{ image_column_class }} block--{{ block.id }} has-tint" {{ block.shopify_attributes }}>
+      {% if block.type == 'image' %}
+      <style>
+        .section-id-{{ section.id }} .block--{{ block.id }}::after {
+          background-color: {{ block.settings.tint_color }};
+          opacity: {{ block.settings.tint_opacity | divided_by: 100.00 }};
+        }
+      </style>
+      <div class="home-image {% if block.settings.link_url != blank %}cta-link-hover-parent{% endif %}">
+
+        {% if block.settings.image == blank %}
+
+        <div class="placeholder-image landscape {% if block.settings.text != blank %}dark{% endif %}">
+          {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+
+        {% else %}
+
+        {% if block.settings.link_url != blank %}<a href="{{ block.settings.link_url }}">{% endif %}
+          {% include 'responsive-image', image: block.settings.image, nomax: true %}
+        {% if block.settings.link_url != blank %}</a>{% endif %}
+
+        {% endif %}
+
+        {% if block.settings.text != blank %}
+        <div class="overlay-text">
+          <div class="overlay-text__inner align-{{ block.settings.alignment }}" style="color:{{ block.settings.color }}">
+            <div class="overlay-text__text">{{ block.settings.text | escape }}</div>
+            {% if block.settings.link_text != blank %}<div class="overlay-text__link"><span class="cta-link">{{ block.settings.link_text }}</span></div>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      {% elsif block.type == 'text' %}
+      <div class="rte align-{{ block.settings.alignment }}">
+        {% if block.settings.title %}
+        <h1>{{ block.settings.title | escape }}</h1>
+        {% endif %}
+
+        <div>{{ block.settings.text }}</div>
+
+        {% if block.settings.button_text != blank %}
+          <div class="inner-row">
+            <a class="button button--slim button--alt" href="{{ block.settings.button_url }}">{{ block.settings.button_text }}</a>
+          </div>
+        {% endif %}
+      </div>
+
+      {% elsif block.type == 'video' %}
+        <div class="video-container" data-video-id="{{ block.settings.video_url.id }}" data-video-type="{{ block.settings.video_url.type }}">
+          {% if block.settings.cover_image != blank %}
+            <div class="video-container__cover">
+              <div class="rimage-outer-wrapper lazyload fade-in"
+                  data-bgset="{% include 'bgset', image: block.settings.cover_image %}"
+                  data-sizes="auto"
+                  data-parent-fit="cover">
+                <noscript>
+                  <div class="rimage-wrapper" style="padding-top:{{ 1 | divided_by: block.settings.cover_image.aspect_ratio | times: 100 }}%">
+                    <img src="{{ block.settings.cover_image | img_url: '1024x1024' }}" alt="{{ block.settings.cover_image.alt | escape }}" class="rimage__image">
+                  </div>
+                </noscript>
+              </div>
+              <button class="button plain video-container__play">{% include 'svg-play' %}</button>
+            </div>
+          {% endif %}
+        </div>
+
+      {% elsif block.type == 'html' %}
+      {{ block.settings.code }}
+
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+{% schema %}
+  {
+    "name": "Custom content",
+    "max_blocks": 3,
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading"
+      },
+      {
+        "type": "text",
+        "id": "subheading",
+        "label": "Subheading"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "url",
+            "id": "link_url",
+            "label": "Image link"
+          },
+          {
+            "type": "header",
+            "content": "Overlay"
+          },
+          {
+            "type": "color",
+            "id": "tint_color",
+            "label": "Overlay",
+            "default": "#3d4246"
+          },
+          {
+            "type": "range",
+            "id": "tint_opacity",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Opacity",
+            "default": 25
+          },
+          {
+            "type": "header",
+            "content": "Text"
+          },
+          {
+            "type": "text",
+            "id": "text",
+            "label": "Text"
+          },
+          {
+            "type": "text",
+            "id": "link_text",
+            "label": "Link text"
+          },
+          {
+            "type": "color",
+            "id": "color",
+            "label": "Color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Alignment",
+            "default": "center",
+            "options": [
+              {
+                "label": "Left",
+                "value": "left"
+              },
+              {
+                "label": "Center",
+                "value": "center"
+              },
+              {
+                "label": "Right",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Text",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "Rich text"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Use this text to share information about your store with your customers.</p><p>Describe products, share announcements, or welcome customers to your store.</p>"
+          },
+          {
+            "type": "text",
+            "id": "button_text",
+            "label": "Button label"
+          },
+          {
+            "type": "url",
+            "id": "button_url",
+            "label": "Button link"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Alignment",
+            "default": "left",
+            "options": [
+              {
+                "label": "Left",
+                "value": "left"
+              },
+              {
+                "label": "Center",
+                "value": "center"
+              },
+              {
+                "label": "Right",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "video",
+        "name": "Video",
+        "settings": [
+          {
+            "id": "video_url",
+            "type": "video_url",
+            "label": "Video URL",
+            "accept": ["youtube", "vimeo"],
+            "info": "Supports Youtube and Vimeo",
+            "default": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          },
+          {
+            "id": "cover_image",
+            "type": "image_picker",
+            "label": "Cover image"
+          }
+        ]
+      },
+      {
+        "type": "html",
+        "name": "Custom HTML",
+        "settings": [
+          {
+            "type": "html",
+            "id": "code",
+            "label": "HTML"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Custom content",
+        "category": "Advanced layout",
+        "blocks": [
+          {
+            "type": "image"
+          },
+          {
+            "type": "image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,84 @@
+<div data-section-type="list-collections-template">
+  <div class="content-header align-centre">
+    <h1 class="page-title">{{ section.settings.title | escape }}</h1>
+  </div>
+
+  {% if section.settings.display_type == 'all' %}
+
+    {% paginate collections by 20 %}
+      <div class="blocklayout">
+        {% for collection in collections %}
+          {% include 'collection-block' %}
+        {% endfor %}
+      </div>
+
+      {% if paginate.pages > 1 %}
+        <div class="row">
+          {% include 'pagination-control' %}
+        </div>
+      {% endif %}
+    {% endpaginate %}
+
+  {% else %}
+
+    <div class="blocklayout">
+      {% for block in section.blocks %}
+        {%- assign collection = collections[block.settings.collection] -%}
+        {% if collection != blank %}
+          {% include 'collection-block' %}
+        {% else %}
+          {% include 'onboarding-collection-block' %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+  {% endif %}
+</div>
+
+
+{% schema %}
+  {
+    "name": "All collections",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Our Collections"
+      },
+      {
+        "type": "paragraph",
+        "content": "All of your collections are listed by default. To customize your list, choose 'Selected' and add collections."
+      },
+      {
+        "type": "radio",
+        "id": "display_type",
+        "label": "Select collections to show",
+        "default": "all",
+        "options": [
+          {
+            "value": "all",
+            "label": "All"
+          },
+          {
+            "value": "selected",
+            "label": "Selected"
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Collection",
+        "settings": [
+          {
+            "type": "collection",
+            "id": "collection",
+            "label": "Collection"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,41 @@
+<div class="pagination cf {{ pagination-control }}">
+  <span class="pagination__summary">
+    {{ 'collections.pagination.showing' | t }}
+    {% if paginate.pages > 1 %}
+    {{ paginate.current_offset | plus: 1 }} -
+    {% if paginate.current_page == paginate.pages %}{{ paginate.items }}
+    {% else %}{{ paginate.current_offset | plus: paginate.page_size }}
+    {% endif %}
+    {{ 'collections.pagination.of' | t }}
+    {% else %}
+    {{ 'collections.pagination.all' | t }}
+    {% endif %}
+    {{ paginate.items }} {{ 'collections.pagination.results' | t }}
+  </span>
+
+  {% if paginate.pages > 1 %}
+  {% if paginate.previous %}
+  <a class="prev" href="{{ paginate.previous.url }}">{% include 'svg-chevron-left' %}</a>
+  {% else %}
+  <span class="prev">{% include 'svg-chevron-left' %}</span>
+  {% endif %}
+
+  {% if paginate.pages == 1 %}
+  <span class="page current">1</span>
+  {% else %}
+  {% for part in paginate.parts %}
+  {% if part.is_link %}
+  <a class="page" href="{{ part.url }}">{{ part.title }}</a>
+  {% else %}
+  <span class="page current">{{ part.title }}</span>
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+
+  {% if paginate.next %}
+  <a class="next" href="{{ paginate.next.url }}">{% include 'svg-chevron-right' %}</a>
+  {% else %}
+  <span class="next">{% include 'svg-chevron-right' %}</span>
+  {% endif %}
+  {% endif %}
+</div>

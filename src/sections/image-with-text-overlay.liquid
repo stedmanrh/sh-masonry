@@ -1,0 +1,201 @@
+<style>
+.section-id-{{ section.id }} .overlay-text .text-1 {
+  font-size: {{ section.settings.slide_overlay_line1_size_int }}px;
+}
+.section-id-{{ section.id }} .overlay-text .text-2 {
+  font-size: {{ section.settings.slide_overlay_line1_size_int | times: 0.6 | round }}px;
+}
+.section-id-{{ section.id }} .slide::after {
+  background-color: {{ section.settings.tint_color }};
+  opacity: {{ section.settings.tint_opacity | divided_by: 100.00 }};
+}
+</style>
+
+<div class="section-id-{{ section.id }} {% unless section.settings.fullwidth %}spacey-row{% endunless %}" data-section-type="image-with-text-overlay">
+  <div class="full-width-image slideshow scaled-text-base">
+    <div class="slide has-tint">
+      {% if section.settings.link_url != blank %}<a href="{{ section.settings.link_url }}">{% endif %}
+
+      {% if section.settings.image == blank %}
+        <div class="placeholder-image placeholder--banner {% if section.settings.heading != blank or section.settings.subheading != blank or section.settings.button_text != blank %}dark{% endif %}">
+          {% capture current %}{% cycle 1, 2 %}{% endcapture %}
+          {{ 'lifestyle-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {% else %}
+        <div class="rimage-outer-wrapper lazyload fade-in"
+            data-bgset="{% include 'bgset', image: section.settings.image %}"
+            data-sizes="auto"
+            data-parent-fit="cover">
+          <div class="rimage-wrapper" style="padding-top:{{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%">
+            <noscript>
+              <img src="{{ section.settings.image | img_url: '1024x1024' }}" alt="{{ section.settings.image.alt | escape }}" class="rimage__image">
+            </noscript>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if section.settings.heading != blank or section.settings.subheading != blank or section.settings.button_text != blank %}
+      <div class="overlay-text {{ section.settings.overlay_position }} {{ section.settings.overlay_color }}">
+        <div class="inner">
+          {% if section.settings.heading != blank %}
+          <h1 class="text-1"><div class="scaled-text">{{ section.settings.heading | escape }}</div></h1>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+          <div class="text-2"><div class="scaled-text">{{ section.settings.subheading | escape }}</div></div>
+          {% endif %}
+          {% if section.settings.button_text != blank %}
+          <div class="text-3">
+            <span class="button">{{ section.settings.button_text | escape }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% if section.settings.link_url != blank %}</a>{% endif %}
+    </div>
+  </div>
+</div>
+
+
+{% schema %}
+  {
+    "name": "Image with text overlay",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "type": "checkbox",
+        "id": "fullwidth",
+        "label": "Full width",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Overlay"
+      },
+      {
+        "type": "color",
+        "id": "tint_color",
+        "label": "Overlay",
+        "default": "#3d4246"
+      },
+      {
+        "type": "range",
+        "id": "tint_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Opacity",
+        "default": 25
+      },
+      {
+        "type": "header",
+        "content": "Text"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Image with text overlay"
+      },
+      {
+        "type": "text",
+        "id": "subheading",
+        "label": "Subheading",
+        "default": "Tell your story with images"
+      },
+      {
+        "type": "text",
+        "id": "button_text",
+        "label": "Button text",
+        "default": "See more"
+      },
+      {
+        "type": "select",
+        "id": "overlay_position",
+        "label": "Text position",
+        "options": [
+          {
+            "value": "posy-top posx-left",
+            "label": "Top Left"
+          },
+          {
+            "value": "posy-top posx-middle",
+            "label": "Top Middle"
+          },
+          {
+            "value": "posy-top posx-right",
+            "label": "Top Right"
+          },
+          {
+            "value": "posy-middle posx-left",
+            "label": "Middle Left"
+          },
+          {
+            "value": "posy-middle posx-middle",
+            "label": "Middle Middle"
+          },
+          {
+            "value": "posy-middle posx-right",
+            "label": "Middle Right"
+          },
+          {
+            "value": "posy-bottom posx-left",
+            "label": "Bottom Left"
+          },
+          {
+            "value": "posy-bottom posx-middle",
+            "label": "Bottom Middle"
+          },
+          {
+            "value": "posy-bottom posx-right",
+            "label": "Bottom Right"
+          }
+        ],
+        "default": "posy-middle posx-middle"
+      },
+      {
+        "type": "select",
+        "id": "overlay_color",
+        "label": "Color",
+        "options": [
+          {
+            "value": "col-light",
+            "label": "Light"
+          },
+          {
+            "value": "col-dark",
+            "label": "Dark"
+          }
+        ],
+        "default": "col-light"
+      },
+      {
+        "type": "range",
+        "id": "slide_overlay_line1_size_int",
+        "min": 40,
+        "max": 100,
+        "step": 10,
+        "unit": "px",
+        "label": "Font size",
+        "default": 50
+      },
+      {
+        "type": "url",
+        "id": "link_url",
+        "label": "Image link"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Image with text overlay",
+        "category": "Image",
+        "settings": {}
+      }
+    ]
+  }
+{% endschema %}

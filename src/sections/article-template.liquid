@@ -1,0 +1,51 @@
+<div class="reading-container">
+  <h1 class="page-title">{{ article.title }}</h1>
+
+  {% if article.image and section.settings.show_feat_img %}
+  <div class="article-image">
+    {% include 'responsive-image', image: article.image %}
+  </div>
+  {% endif %}
+
+  <p class="meta">
+    {% if section.settings.show_author %}
+    <span class="meta-item">{{ article.author | escape }}</span>
+    {% endif %}
+    <span class="meta-item">{{ article.published_at | date: format: 'month_date_year' }}</span>
+  </p>
+
+  <div class="rte border-under">
+    {{ article.content }}
+  </div>
+
+  {% if article.tags.size > 0 %}
+  <div class="inner-row border-under">
+    <p class="in-page-tags">
+      {{ 'blogs.article.tags' | t }}
+      {% for tag in article.tags %}
+      <span class="tag">{{ tag | link_to_tag: tag }}</span>
+      {% endfor %}
+    </p>
+    {% include 'social-sharing' with article %}
+  </div>
+  {% endif %}
+</div>
+
+{% schema %}
+  {
+    "name": "Article pages",
+    "settings": [
+	  {
+        "type": "checkbox",
+        "id": "show_feat_img",
+        "label": "Show featured image",
+        "default": true
+      },
+	  {
+        "type": "checkbox",
+        "id": "show_author",
+        "label": "Show author"
+      }
+	]
+  }
+{% endschema %}

@@ -1,0 +1,238 @@
+<div data-section-type="collection-template">
+  {% paginate collection.products by section.settings.coll_num_per_page_int %}
+
+  <div class="content-header align-centre">
+    <h1 class="page-title">{{ collection.title | escape }}</h1>
+  </div>
+
+  {% if collection.description != blank %}
+  <div class="reading-container rte align-centre">{{ collection.description }}</div>
+  {% endif %}
+
+  <div class="filter-row row cf">
+    {% assign show_tags = false %}
+    {% if section.settings.show_tagfilt_custom1 %}
+    {% assign custom_tag_arr1 = section.settings.tagfilt_custom1_tags | replace: ', ',',' | split: ',' | downcase %}
+    {% capture filter1_html %}
+    <div class="filter filter--dropdown">
+      <label for="custom_tagfilter1">{{ section.settings.tagfilt_custom1_name | escape }}</label>
+      {% include 'svg-chevron-down' %}
+      <select class="navdrop" id="custom_tagfilter1" name="custom_tagfilter1">
+        <option value="/collections/{{ collection.handle }}/{% for tag in current_tags %}{{ tag | handle }}{% unless forloop.last %}+{% endunless %}{% endfor %}">{{ 'collections.filtering.all' | t }}</option>
+        {%- for tag in collection.all_tags -%}
+          {%- assign lower_tag = tag | downcase -%}
+          {%- if custom_tag_arr1 contains lower_tag -%}
+            {%- assign show_tags = true -%}
+            <option value="/collections/{{ collection.handle }}/{% for tag in current_tags %}{{ tag | handle }}+{% endfor %}{{ tag | handle }}" data-custom="{{ tag | handle }}"
+                    {% if current_tags contains tag %}selected="selected"{% endif %}>{{ tag }}</option>
+          {%- endif -%}
+        {%- endfor -%}
+      </select>
+    </div>
+    {% endcapture %}
+    {% endif %}
+
+
+    {% if section.settings.show_tagfilt_custom2 %}
+    {% assign custom_tag_arr2 = section.settings.tagfilt_custom2_tags | replace: ', ',',' | split: ',' | downcase %}
+    {% capture filter2_html %}
+    <div class="filter filter--dropdown">
+      <label for="custom_tagfilter2">{{ section.settings.tagfilt_custom2_name | escape }}</label>
+      {% include 'svg-chevron-down' %}
+      <select class="navdrop" id="custom_tagfilter2" name="custom_tagfilter2">
+        <option value="/collections/{{ collection.handle }}/{% for tag in current_tags %}{{ tag | handle }}{% unless forloop.last %}+{% endunless %}{% endfor %}">{{ 'collections.filtering.all' | t }}</option>
+        {%- for tag in collection.all_tags -%}
+          {%- assign lower_tag = tag | downcase -%}
+          {%- if custom_tag_arr2 contains lower_tag -%}
+            {%- assign show_tags = true -%}
+            <option value="/collections/{{ collection.handle }}/{% for tag in current_tags %}{{ tag | handle }}+{% endfor %}{{ tag | handle }}" data-custom="{{ tag | handle }}"
+                    {% if current_tags contains tag %}selected="selected"{% endif %}>{{ tag }}</option>
+          {%- endif -%}
+        {%- endfor -%}
+      </select>
+    </div>
+    {% endcapture %}
+    {% endif %}
+
+
+    {% if section.settings.show_tagfilt_ungrouped and collection.handle and collection.all_tags.size > 0 %}
+      {%- capture filter_html -%}
+        {%- for tag in collection.all_tags -%}
+          {%- assign lower_tag = tag | downcase -%}
+          {%- unless tag contains 'meta-' or custom_tag_arr1 contains lower_tag or custom_tag_arr2 contains lower_tag -%}
+            {%- assign show_tags = true -%}
+            {{ tag | link_to_add_tag: tag }}
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+    {% endif %}
+
+    {% if show_tags %}
+    <div class="filter-group filter-group--start-hidden">
+      <div class="filter-header">
+        <a class="filter-toggle" href="#">
+          {{ 'collections.filtering.filter' | t }}
+          {% include 'svg-chevron-down' %}
+        </a>
+
+        {% capture close_replace_html %} {% include 'svg-close' %}{{'</a>'}}{% endcapture %}
+        <span class="filter-header__current-tags">
+          {% for tag in current_tags %}
+          {{ tag | link_to_remove_tag: tag | replace: '</a>', close_replace_html }}
+          {% endfor %}
+
+          {% if current_tags %}
+          <a class="clear-tags" href="/collections/{{ collection.handle }}">
+            {{ 'collections.filtering.clear_all' | t }} {% include 'svg-close' %}
+          </a>
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="filter-items">
+        {% if filter_html contains 'a' %}
+        <div class="filter filter--tags align-centre">
+          {{ filter_html }}
+        </div>
+        {% endif %}
+        <div class="filter-dropdowns">
+          {% if filter1_html contains 'data-custom' %}{{ filter1_html }}{% endif %}
+          {% if filter2_html contains 'data-custom' %}{{ filter2_html }}{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="collection-sorter row cf">
+    {% if section.settings.coll_show_sort %}
+    <div class="collection-sort inline-select">
+      <label for="sort-by">{{ 'collections.sorting.title' | t }}</label>
+      <select id="sort-by" data-initval="{{ collection.sort_by | default: collection.default_sort_by  }}">
+        {% if section.settings.coll_show_feat %}<option value="manual">{{ 'collections.sorting.featured' | t }}</option>{% endif %}
+        <option value="price-ascending">{{ 'collections.sorting.price_ascending' | t }}</option>
+        <option value="price-descending">{{ 'collections.sorting.price_descending' | t }}</option>
+        <option value="title-ascending">{{ 'collections.sorting.az' | t }}</option>
+        <option value="title-descending">{{ 'collections.sorting.za' | t }}</option>
+        <option value="created-ascending">{{ 'collections.sorting.date_ascending' | t }}</option>
+        <option value="created-descending">{{ 'collections.sorting.date_descending' | t }}</option>
+        <option value="best-selling">{{ 'collections.sorting.best_selling' | t }}</option>
+      </select>
+    </div>
+    {% endif %}
+
+    {% unless section.settings.coll_infscr %}
+    {% include 'pagination-control' %}
+    {% endunless %}
+  </div>
+
+  <div class="blocklayout {% if section.settings.coll_infscr %}do-infinite{% endif %}">
+    {%- if collection.products != blank and settings.adv_ratio -%}
+      {%- capture calculated_aspect_ratio -%}{% include 'minmax-image-ratio', products: collection.products, type: settings.prod_thumb_img_ratio %}{%- endcapture -%}
+    {%- endif -%}
+
+    {% for product in collection.products %}
+
+    {% include 'product-block' with product, product_collection: collection, calculated_aspect_ratio: calculated_aspect_ratio %}
+
+    {% else %}
+
+    <div class="block text no-inf size-large"><div class="main">{{ 'collections.general.no_matches' | t }}</div></div>
+
+    {% endfor %}
+  </div><!-- /.blocklayout -->
+
+  <div class="row hidden hidden-pagination">
+    {% include 'pagination-control' %}
+  </div>
+
+  {% endpaginate %}
+</div>
+
+
+{% schema %}
+  {
+    "name": "Collection pages",
+    "settings": [
+	  {
+        "type": "range",
+        "id": "coll_num_per_page_int",
+        "min": 24,
+        "max": 48,
+        "step": 8,
+        "label": "Products per page",
+        "default": 24
+      },
+      {
+        "type": "checkbox",
+        "id": "coll_infscr",
+        "label": "Enable infinite-scroll"
+      },
+      {
+        "type": "header",
+        "content": "Filtering"
+      },
+      {
+        "type": "checkbox",
+        "id": "coll_show_sort",
+        "label": "Show sorting dropdown",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "coll_show_feat",
+        "label": "Show 'Featured' sort option",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_tagfilt_ungrouped",
+        "label": "Show ungrouped tags",
+		"default": true
+      },
+      {
+        "type": "header",
+        "content": "Tag group 1"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_tagfilt_custom1",
+        "label": "Show",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "tagfilt_custom1_name",
+        "label": "Name"
+      },
+      {
+        "type": "text",
+        "id": "tagfilt_custom1_tags",
+        "label": "Tags to include",
+        "info": "Separate with commas"
+      },
+      {
+        "type": "header",
+        "content": "Tag group 2"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_tagfilt_custom2",
+        "label": "Show",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "tagfilt_custom2_name",
+        "label": "Name"
+      },
+      {
+        "type": "text",
+        "id": "tagfilt_custom2_tags",
+        "label": "Tags to include",
+        "info": "Separate with commas"
+      }
+	]
+  }
+{% endschema %}
+

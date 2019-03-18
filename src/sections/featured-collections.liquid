@@ -1,0 +1,59 @@
+<div data-section-type="featured-collections">
+  <div class="spacey-row align-center">
+    <h1>{{ section.settings.title | escape }}</h1>
+  </div>
+
+  <div class="blocklayout">
+    {% for block in section.blocks %}
+    {% assign collection = collections[block.settings.collection] %}
+    {% unless collection == blank %}
+    {% include 'collection-block', custom_attrs: block.shopify_attributes %}
+
+    {% else %}
+
+    {% include 'onboarding-collection-block' %}
+    {% endunless %}
+    {% endfor %}
+  </div>
+</div>
+
+
+{% schema %}
+  {
+    "name": "Collection list",
+    "max_blocks": 18,
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Collection list"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "collection",
+        "name": "Collection",
+        "settings": [
+          {
+            "type": "collection",
+            "id": "collection",
+            "label": "Collection"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Collection list",
+        "category": "Collection",
+        "settings": {},
+        "blocks": [
+            { "type": "collection" },
+            { "type": "collection" },
+            { "type": "collection" }
+        ]
+      }
+    ]
+  }
+{% endschema %}

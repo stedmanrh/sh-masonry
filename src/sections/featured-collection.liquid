@@ -1,68 +1,41 @@
-{%- comment -%}
-  This is a required section for the Shopify Theme Store.
-  It is available in the "Featured Collection" section in the theme editor.
+<div data-section-type="featured-collection">
+  {% assign collection = collections[section.settings.collection] %}
 
-  Theme Store required settings
-  - Collection
+  {% unless collection == blank %}
 
-  Theme Store optional settings
-  - Heading: title of the featured collection section
-{%- endcomment -%}
-<section class="featured-collection">
-  {% if section.settings.title != blank %}
-    <h2 class="featured-collection__title">{{ section.settings.title | escape }}</h2>
-  {% endif %}
+  <div class="spacey-row align-center">
+    <h1><a href="{{ collection.url }}">{{ section.settings.title | escape }}</a></h1>
+  </div>
 
-  {%- assign collection = collections[section.settings.collection] -%}
+  {%- if collection.products != blank and settings.adv_ratio -%}
+    {%- capture calculated_aspect_ratio -%}{% include 'minmax-image-ratio', products: collection.products, type: settings.prod_thumb_img_ratio == 'tallest' %}{%- endcapture -%}
+  {%- endif -%}
 
-  {% for product in collection.products limit: 6 %}
-    <a href="{{ product.url | within: collection }}" class="featured-collection-item">
-      {% if product.featured_image != blank %}
-        <div class="featured-collection__image">
-          {% include 'responsive-image' with
-            image: product.featured_image,
-            max_width: 480,
-            max_height: 480
-          %}
-        </div>
-      {% endif %}
-
-      <p>{{ product.title | escape }}</p>
-      <span>
-        {% if product.compare_at_price > product.price %}
-          {% if product.price_varies %}
-            {%- assign sale_price = product.price | money -%}
-            {{ 'products.product.on_sale_from_html' | t: price: sale_price }}
-          {% else %}
-            {{ 'products.product.on_sale' | t }}
-            {{ product.price | money }}
-          {% endif %}
-        {% else %}
-          {% if product.price_varies %}
-            {%- assign price = product.price | money -%}
-            {{ 'products.product.from_text_html' | t: price: price }}
-          {% else %}
-            {{ product.price | money }}
-          {% endif %}
-        {% endif %}
-      </span>
-    </a>
-  {% else %}
-    {% for i in (1..6) %}
-      <a href="#" class="featured-collection-item">
-        {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
-        {{ 'product-' | append: current | placeholder_svg_tag: 'placeholder-svg placeholder-svg--small' }}
-
-        <p>{{ 'homepage.onboarding.product_title' | t }}</p>
-        <p>{{ 1999 | money }}</p>
-      </a>
+  <div class="blocklayout" data-row-limit="{{ section.settings.row_count }}">
+    {% for product in collection.products %}
+      {% include 'product-block' with product, product_collection: collection, calculated_aspect_ratio: calculated_aspect_ratio %}
     {% endfor %}
-  {% endfor %}
-</section>
+  </div>
+
+  {% else %}
+
+  <div class="spacey-row align-center">
+    <h1>{{ section.settings.title }}</h1>
+  </div>
+
+  <div class="blocklayout" data-row-limit="{{ section.settings.row_count }}">
+    {% for i in (1..12) %}
+      {% include 'onboarding-product-block' %}
+    {% endfor %}
+  </div>
+
+  {% endunless %}
+</div>
 
 {% schema %}
   {
     "name": "Featured collection",
+    "class": "index-section",
     "settings": [
       {
         "type": "text",
@@ -71,9 +44,33 @@
         "default": "Featured collection"
       },
       {
-        "id": "collection",
         "type": "collection",
+        "id": "collection",
         "label": "Collection"
+      },
+      {
+        "type": "select",
+        "id": "row_count",
+        "label": "Rows",
+        "options": [
+          {
+            "label": "1",
+            "value": "1"
+          },
+          {
+            "label": "2",
+            "value": "2"
+          },
+          {
+            "label": "3",
+            "value": "3"
+          },
+          {
+            "label": "No limit",
+            "value": ""
+          }
+        ],
+        "default": "1"
       }
     ],
     "presets": [

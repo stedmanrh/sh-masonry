@@ -1,79 +1,117 @@
-{%- comment -%}
-  This is a required section for the Shopify Theme Store.
-  It is available when you add the "Image with text" section in the theme editor.
-
-  Theme Store required settings
-  - Image
-  - Heading: title of the block
-  - Text: description of the block
-
-  Theme Store optional settings
-  - Button label: label associated with the button
-  - Button link: link of the button
-{%- endcomment -%}
-
-<section class="image-with-text">
-  {% capture image_layout %}
-    <div class="image-with-text__image">
-      {% if section.settings.image != blank %}
-        {% include 'responsive-image' with
-          image: section.settings.image,
-          max_width: 545,
-          max_height: 545
-        %}
-      {% else %}
-        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+{% capture image_html %}
+  <div class="text-beside-image__image lazyload--placeholder">
+    {% if section.settings.image_url != blank %}
+    <a href="{{ section.settings.image_url }}">
       {% endif %}
-    </div>
-  {% endcapture %}
 
-  {% if section.settings.layout == 'left' %}
-    {{ image_layout }}
-  {% endif %}
+      {% if section.settings.image == blank %}
+        <div class="placeholder-image">{{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+      {% else %}
+        <div class="rimage-outer-wrapper lazyload fade-in rimage-bg-{% if section.settings.image_fill %}fill{% else %}fit{% endif %}"
+            data-bgset="{% include 'bgset', image: section.settings.image %}"
+            data-sizes="auto"
+            data-parent-fit="cover"
+            style="max-width: {{ section.settings.image.width }}px; max-height: {{ section.settings.image.height }}px">
+          <div class="rimage-wrapper" style="padding-top:{{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%">
+            <noscript>
+              <img src="{{ section.settings.image | img_url: '1024x1024' }}" alt="{{ section.settings.image.alt | escape }}" class="rimage__image">
+            </noscript>
+          </div>
+        </div>
+      {% endif %}
 
-  <div class="image-with-text__text">
-    {% if section.settings.title != blank %}
-      <h2>{{ section.settings.title | escape }}</h2>
-    {% endif %}
-    {% if section.settings.text != blank %}
-      <div>{{ section.settings.text }}</div>
-    {% endif %}
-    {% if section.settings.button_label != blank and section.settings.button_link != blank %}
-      <a href="{{ section.settings.button_link }}">
-        {{ section.settings.button_label | escape }}
-      </a>
+      {% if section.settings.image_url != blank %}
+    </a>
     {% endif %}
   </div>
+{% endcapture %}
 
-  {% if section.settings.layout == 'right' %}
-    {{ image_layout }}
-  {% endif %}
-</section>
+<div class="text-beside-image spacey-row {% if section.settings.show_background_tint %}background-tint{% endif %} cf section-id-{{ section.id }}" data-section-type="text-beside-image">
+
+  {% if section.settings.layout == 'left' %}{{ image_html }}{% endif %}
+
+  <div class="text-beside-image__text">
+    <div class="text-beside-image__text__wrap {% if section.settings.show_background_tint %}padded-block{% else %}vertically-padded-block padded-block-desktop-{{ section.settings.layout }}{% endif %}">
+      {% if section.settings.title != blank %}
+      <h1 class="text-beside-image__title">{{ section.settings.title | escape }}</h1>
+      {% endif %}
+      <div class="rte">{{ section.settings.text }}</div>
+      {% if section.settings.button_text != blank %}
+
+      <div class="button-row">
+        {% if section.settings.button_url != blank %}
+          <a class="button auto-width" href="{{ section.settings.button_url }}">
+        {% else %}
+          <span class="button auto-width">
+        {% endif %}
+
+        {{ section.settings.button_text | escape }}
+
+        {% if section.settings.button_url == blank %}
+          </span>
+        {% else %}
+          </a>
+        {% endif %}
+      </div>
+
+      {% endif %}
+    </div>
+  </div>
+
+  {% if section.settings.layout == 'right' %}{{ image_html }}{% endif %}
+
+</div>
+
 
 {% schema %}
   {
     "name": "Image with text",
     "settings": [
       {
+        "type": "select",
+        "id": "layout",
+        "label": "Layout",
+        "default": "right",
+        "options": [
+          {
+            "value": "right",
+            "label": "Text on left"
+          },
+          {
+            "value": "left",
+            "label": "Text on right"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "show_background_tint",
+        "label": "Show background tint",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Image"
+      },
+      {
         "type": "image_picker",
         "id": "image",
         "label": "Image"
       },
       {
-        "type": "select",
-        "id": "layout",
-        "label": "Image alignment",
-        "default": "left",
-        "options": [
-          {
-            "value": "left",
-            "label": "Left"
-          },
-          {
-            "value": "right",
-            "label": "Right"
-          }
-        ]
+        "type": "checkbox",
+        "id": "image_fill",
+        "label": "Fill container",
+        "default": true
+      },
+      {
+        "type": "url",
+        "id": "image_url",
+        "label": "Link"
+      },
+      {
+        "type": "header",
+        "content": "Text"
       },
       {
         "type": "text",
@@ -85,23 +123,24 @@
         "type": "richtext",
         "id": "text",
         "label": "Text",
-        "default": "<p>Pair large text with an image to give focus to your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>"
+        "default": "<p>Use this text to share information about your store with your customers.</p><p>Describe product, share announcements, or welcome customers to your store.</p>"
       },
       {
         "type": "text",
-        "id": "button_label",
-        "label": "Button label"
+        "id": "button_text",
+        "label": "Button text"
       },
       {
         "type": "url",
-        "id": "button_link",
+        "id": "button_url",
         "label": "Button link"
       }
     ],
     "presets": [
-      {
+	    {
         "name": "Image with text",
-        "category": "Image"
+        "category": "Image",
+        "settings": {}
       }
     ]
   }

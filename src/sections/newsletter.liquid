@@ -1,38 +1,29 @@
-{%- comment -%}
-  This is a required section for the Shopify Theme Store.
-  It is available when you add "Newsletter" section on the Theme Editor.
-
-  Theme Store required settings
-  - Heading: title of the newsletter section
-  - Subheading: description of the newsletter section
-{%- endcomment -%}
-<section>
-  {% if section.settings.section_title != blank %}
-    <label for="Email">{{ section.settings.section_title | escape }}</label>
-  {% endif %}
-  {% if section.settings.subheading != blank %}
-    <p>{{ section.settings.subheading | escape }}</p>
-  {% endif %}
-
-  {% form 'customer' %}
-    {{ form.errors | default_errors }}
-    {% if form.posted_successfully? %}
-      <p>{{ 'general.newsletter_form.confirmation' | t }}</p>
-    {% else %}
-      <input type="hidden" name="contact[tags]" value="newsletter">
-      <input type="email"
-        name="contact[email]"
-        id="Email"
-        value="{% if customer.email != blank %}{{ customer.email }}{% endif %}"
-        placeholder="{{ 'general.newsletter_form.email_placeholder' | t }}"
-        autocorrect="off"
-        autocapitalize="off">
-      <button type="submit" name="commit" id="Subscribe">
-        <span>{{ 'general.newsletter_form.submit' | t }}</span>
-      </button>
-    {% endif %}
-  {% endform %}
-</section>
+<div class="signup-form {% if section.settings.show_background_tint %}padded-block background-tint{% else %}vertically-padded-block{% endif %} form">
+  <div class="signup-form-container">
+    <h6 class="h1 title">{{ section.settings.title | escape }}</h6>
+    <div class="message rte">{{ section.settings.text }}</div>
+    {% form 'customer' %}
+      {% if form.posted_successfully? %}
+        <p class="msg">{{ 'layout.signup.post_success' | t }}</p>
+      {% else %}
+        {% if form.errors %}
+          {% for field in form.errors %}
+          <p class="msg error">{{ field | capitalize }} - {{ form.errors.messages[field] }}</p>
+          {% endfor %}
+        {% endif %}
+        <div class="inline-input-button-row">
+          <div class="inline-input-button-row__input">
+            <input type="hidden" id="contact_tags" name="contact[tags]" value="prospect,newsletter"/>
+            <input type="email" class="text required" value="" name="contact[email]" placeholder="{{ 'layout.signup.placeholder' | t }}" />
+          </div>
+          <div class="inline-input-button-row__button">
+            <button type="submit">{{ 'layout.signup.submit' | t }}</button>
+          </div>
+        </div>
+      {% endif %}
+    {% endform %}
+  </div>
+</div>
 
 {% schema %}
   {
@@ -40,24 +31,33 @@
     "settings": [
       {
         "type": "text",
-        "id": "section_title",
+        "id": "title",
         "label": "Heading",
-        "default": "Subscribe to our newsletter"
+        "default": "Newsletter"
       },
-      {
-        "type": "text",
-        "id": "subheading",
+	    {
+        "type": "richtext",
+        "id": "text",
         "label": "Subheading",
-        "default": "A short sentence describing what someone will receive by subscribing"
+        "default": "<p>Sign up to our newsletter and we’ll keep you up to date with the latest arrivals<\/p>"
       },
       {
         "type": "paragraph",
         "content": "Any customers who sign up will have an account created for them in Shopify. [View customers](/admin/customers?query=&accepts_marketing=1)"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_background_tint",
+        "label": "Show background tint",
+        "default": true
       }
-    ],
-    "presets": [{
-      "name": "Newsletter",
-      "category": "Promotional"
-    }]
+	  ],
+	  "presets": [
+      {
+        "name": "Newsletter",
+        "category": "Promotional",
+        "settings": {}
+      }
+	  ]
   }
 {% endschema %}

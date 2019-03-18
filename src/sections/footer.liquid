@@ -1,68 +1,146 @@
-<footer>
-
-  {%- assign social_accounts = 'Facebook, Twitter, Pinterest, Instagram, Snapchat, Tumblr, YouTube, Vimeo,' | split: ', ' -%}
-  <ul>
-    {% for social in social_accounts %}
-      {%- assign social_handle = social | handleize -%}
-      {% capture social_link %}social_{{ social_handle }}_link{% endcapture %}
-      {% capture social_icon %}icon-{{ social_handle }}{% endcapture %}
-
-      {% if settings[social_link] != blank %}
-        <li>
-          <a href="{{ settings[social_link] }}" title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: social }}">
-            {% include social_icon %}
-            <span class="icon-fallback-text">{{ social }}</span>
-          </a>
-        </li>
-      {% endif %}
-
-    {% endfor %}
-  </ul>
-
-  {% if section.settings.show_payment_icons %}
-    {% unless shop.enabled_payment_types == empty %}
-      <span class="visually-hidden">{{ 'layout.footer.payment_methods' | t }}</span>
-      <ul class="payment-icons">
-        {% for type in shop.enabled_payment_types %}
-          <li>
-            {{ type | payment_type_svg_tag: class: 'icon' }}
-          </li>
-        {% endfor %}
-      </ul>
+<div class="page-footer" data-section-type="footer-section">
+  {% if section.settings.show_signup %}
+    {% unless section.settings.hide_signup_home == true and template contains 'index' %}
+      <div class="signup-form {% if section.settings.show_signup_background_tint %}padded-block background-tint{% endif %} form">
+        <div class="signup-form-container">
+          <h6 class="h1 title">{{ section.settings.newsletter_title | escape }}</h6>
+          <div class="message rte">{{ section.settings.newsletter_text }}</div>
+          {% form 'customer' %}
+            {% if form.posted_successfully? %}
+              <p class="msg">{{ 'layout.signup.post_success' | t }}</p>
+            {% else %}
+              {% if form.errors %}
+                {% for field in form.errors %}
+                  <p class="msg error">{{ field | capitalize }} - {{ form.errors.messages[field] }}</p>
+                {% endfor %}
+              {% endif %}
+              <div class="inline-input-button-row">
+                <div class="inline-input-button-row__input">
+                  <input type="hidden" id="contact_tags" name="contact[tags]" value="prospect,newsletter"/>
+                  <input type="email" class="text required" value="" name="contact[email]" placeholder="{{ 'layout.signup.placeholder' | t }}" />
+                </div>
+                <div class="inline-input-button-row__button">
+                  <button type="submit">{{ 'layout.signup.submit' | t }}</button>
+                </div>
+              </div>
+            {% endif %}
+          {% endform %}
+        </div>
+      </div>
     {% endunless %}
   {% endif %}
 
-  {%- assign footer_linklist = section.settings.footer_linklist -%}
-  {% if linklists[footer_linklist].links.size > 0 %}
-    <ul>
-      {% for link in linklists[footer_linklist].links %}
-        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+  <div class="page-footer__lower">
+    {% if section.blocks != blank %}
+      <div class="page-footer__row page-footer__row-spacing page-footer__nav-column-container">
+        {% for block in section.blocks %}
+          <div class="page-footer__nav-column">
+            <div class="nav-column__title h3"><button class="button plain">{{ linklists[block.settings.menu].title }}</button> <span class="chevron">{% include 'svg-chevron-down' %}</span></div>
+            <ul>
+              {% for link in linklists[block.settings.menu].links %}
+                <li>{{ link.title | link_to: link.url }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-  <div>
-    <small>{{ 'layout.footer.copyright' | t }} &copy; {{ 'now' | date: "%Y" }}, {{ shop.name | link_to: '/' }}. {{ powered_by_link }}</small>
+    <div class="page-footer__row">
+      {% if linklists[section.settings.menu_linklist].links.size > 0 %}
+        <ul class="page-footer__nav page-footer__row-spacing">
+          {% for link in linklists[section.settings.menu_linklist].links %}
+            <li>{{ link.title | link_to: link.url }}{% unless forloop.last %} <span class="separator">&middot;</span>{% endunless %}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <div class="page-footer__social-icons page-footer__row-spacing">
+        {% include 'social-icons' %}
+      </div>
+    </div>
+
+    <div class="page-footer__row page-footer__row-spacing">
+      <div class="copy">
+        &copy; {{ "now" | date: "%Y" }} {{ shop.name | link_to: '/' }}.
+
+        {{ 'layout.footer.theme_by_html' | t }}
+
+        {{ powered_by_link }}
+
+      </div>
+      <span class="payment-methods">
+        {% for type in shop.enabled_payment_types %}
+          {{ type | payment_type_svg_tag: class: 'payment-icon' }}
+        {% endfor %}
+      </span>
+    </div>
   </div>
-</footer>
+</div>
+
 
 {% schema %}
   {
     "name": "Footer",
+    "max_blocks": 4,
     "settings": [
       {
         "type": "link_list",
-        "id": "footer_linklist",
-        "label": "First menu",
-        "default": "footer"
+        "id": "menu_linklist",
+        "label": "Small menu",
+		    "default": "footer",
+		    "info": "This menu won't show dropdown items"
+      },
+      {
+        "type": "header",
+        "content": "Newsletter signup"
       },
       {
         "type": "checkbox",
-        "id": "show_payment_icons",
-        "label": "Show payment icons",
+        "id": "show_signup",
+        "label": "Show newsletter signup"
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_signup_home",
+        "label": "Exclude from home page",
         "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_signup_background_tint",
+        "label": "Show background tint",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "newsletter_title",
+        "label": "Heading",
+        "default": "Inbox me!"
+      },
+	    {
+        "type": "richtext",
+        "id": "newsletter_text",
+        "label": "Subheading",
+        "default": "<p>Sign up to our newsletter and we’ll keep you up to date with the latest arrivals<\/p>"
+      },
+      {
+        "type": "paragraph",
+        "content": "Any customers who sign up will have an account created for them in Shopify. [View customers](/admin/customers?query=&accepts_marketing=1)"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "menu",
+        "name": "Menu column",
+        "settings": [
+          {
+            "type": "link_list",
+            "id": "menu",
+            "label": "Menu",
+		        "info": "This menu won't show dropdown items"
+          }
+        ]
       }
     ]
   }
-
 {% endschema %}

@@ -1,80 +1,86 @@
-{% paginate search.results by 10 %}
+{% paginate search.results by 20 %}
 
-  <h1>
-    {% if search.performed %}
-      <span class="visually-hidden">{{ 'general.search.heading' | t: count: search.results_count }}:</span>
-        {{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}
-    {% else %}
-      {{ 'general.search.title' | t }}
-    {% endif %}
-  </h1>
+<div class="content-header">
+  <h1 class="page-title align-center">{{ 'general.search.title' | t }}</h1>
 
-  <form action="/search" method="get" role="search">
-    <label for="Search" class="label-hidden">
-      {{ 'general.search.placeholder' | t }}
-    </label>
-    <input type="search"
-           name="q"
-           id="Search"
-           value="{{ search.terms | escape }}"
-           placeholder="{{ 'general.search.placeholder' | t }}">
-    <button type="submit" class="button">
-      {% include 'icon-search' %}
-      <span class="icon-fallback-text">{{ 'general.search.submit' | t }}</span>
-    </button>
+  <form class="row" id="search-form" name="search" action="/search">
+    <div class="inline-input-button-row">
+      <div class="inline-input-button-row__input">
+        <input type="text" id="q" name="q" placeholder="{{ 'general.search.page_placeholder' | t }}" value="" />
+      </div>
+      <div class="inline-input-button-row__button">
+        <input type="submit" id="search-submit" value="{{ 'general.search.submit' | t }}" />
+      </div>
+    </div>
+    <input type="hidden" name="type" value="{{ settings.search_type }}" />
   </form>
 
   {% if search.performed %}
-    {% if search.results_count == 0 %}
-      <p>{{ 'general.search.no_results_html' | t: terms: search.terms }}</p>
-    {% else %}
-      <h2 class="visually-hidden">{{ 'general.search.heading' | t: count: search.results_count }}</h2>
-      <ul>
-        {% for item in search.results %}
-          <li>
-            <a href="{{ item.url | within: collection }}">
-              {% assign featured_image = item.image | default: item.featured_image %}
-              {% if featured_image != blank %}
-                {{ featured_image | img_url: '240x240' | img_tag }}
+  {% if search.results != empty %}
+  <div class="h3 align-center">{{ 'general.search.your_search_html' | t: terms: search.terms }}, {{ 'general.search.results_with_count' | t: count: search.results_count }}</div>
+  {% else %}
+  <div class="h3 align-center">{{ 'general.search.no_results_html' | t: terms: search.terms }}</div>
+  {% endif%}
+  {% endif %}
+</div>
+
+
+{% if search.performed %}
+<div class="row cf">
+  {% include 'pagination-control' %}
+</div>
+{% endif %}
+
+<div class="blocklayout search-results" data-results-total="{{ paginate.items }}">
+  {% if search.performed %}
+    {% if search.results != empty %}
+
+      {%- if settings.adv_ratio -%}
+      {%- assign ratio = 999 -%}
+        {%- for item in search.results -%}
+          {%- if item.object_type == 'product' -%}
+            {%- if ratio == 999 -%}
+              {%- assign ratio = item.featured_image.aspect_ratio -%}
+            {%- else -%}
+              {%- if settings.prod_thumb_img_ratio == 'tallest' -%}
+                {%- if item.featured_image.aspect_ratio < ratio -%}{%- assign ratio = item.featured_image.aspect_ratio -%}{%- endif -%}
+              {%- else -%}
+                {%- if item.featured_image.aspect_ratio > ratio -%}{%- assign ratio = item.featured_image.aspect_ratio -%}{%- endif -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- capture calculated_aspect_ratio -%}{{ ratio }}{%- endcapture -%}
+      {%- endif -%}
+
+      {% for item in search.results %}
+        {% if item.object_type == 'product' %}
+          {% assign product = item %}
+          {% include 'product-block' with item, product_collection: false, product_image_size_norm: true, calculated_aspect_ratio: calculated_aspect_ratio %}
+        {% else %}
+          <div class="block text size-large">
+            <div class="main">
+              {% if item.object_type == 'article' and item.image %}
+              <p class="image">{{ item.image | img_url: '1024x1024' | img_tag | link_to: item.url }}</p>
               {% endif %}
-              <h3>{{ item.title }}</h3>
-            </a>
-            {% if item.object_type == 'product' %}
-              <p>
-                {% if item.compare_at_price > item.price %}
-                  {% if item.price_varies %}
-                    {% assign sale_price = item.price | money %}
-                    {{ 'products.product.on_sale_from_html' | t: price: sale_price }}
-                  {% else %}
-                    {{ 'products.product.on_sale' | t }}
-                    <span>{{ item.price | money }}</span>
-                  {% endif %}
-                  <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
-                  <s>{{ item.compare_at_price | money }}</s>
-                {% else %}
-                  {% if item.price_varies %}
-                    {% assign price = item.price | money %}
-                    <span>{{ 'products.product.from_text_html' | t: price: price }}</span>
-                  {% else %}
-                    <span>{{ item.price | money }}</span>
-                  {% endif %}
-                {% endif %}
-                {% unless item.available %}
-                {{ 'products.product.sold_out' | t }}
-                {% endunless %}
-              </p>
-            {% else %}
-              <p>{{ item.content | strip_html | truncatewords: 50 }}</p>
-            {% endif %}
 
-          </li>
-        {% endfor %}
-      </ul>
-
-      {% if paginate.pages > 1 %}
-        {% include 'pagination' %}
-      {% endif %}
+              <h2 class="search-result-title">{{ item.title }}</h2>
+              <p class="search-result-description">{{ item.content | strip_html | truncatewords: 40 | highlight: search.terms }}</p>
+            </div>
+            <div class="sub">
+              <a class="cta-link" href="{{ item.url }}">{{ 'general.search.read_more' | t }}</a>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
     {% endif %}
   {% endif %}
+</div>
+
+{% if search.performed and search.results != empty %}
+<div class="row cf">
+  {% include 'pagination-control' %}
+</div>
+{% endif %}
 
 {% endpaginate %}

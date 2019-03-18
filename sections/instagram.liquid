@@ -1,0 +1,93 @@
+<div class="spacey-row section-id-{{ section.id }}" data-section-type="instagram">
+
+  {% if section.settings.title != blank %}
+  <h1 class="hometitle h4-style align-center">
+    <a>
+      {{ section.settings.title | escape }}
+    </a>
+  </h1>
+  {% endif %}
+
+  {% unless section.settings.access_token == blank %}
+
+    <div class="willstagram"
+        data-user_id="self"
+        data-count="10"
+        data-access_token="{{ section.settings.access_token | escape }}"
+        data-account=".spacey-row|.hometitle"
+        data-show-hover="{{ section.settings.show_hover }}"></div>
+
+  {% else %}
+
+    <div class="willstagram willstagram-placeholder">
+      <ul class="willstagram__items">
+        {% for i in (1..10) %}<li class="willstagram__item">
+            <div class="placeholder-image">{{ 'image' | placeholder_svg_tag }}</div>
+          </li>{% endfor %}
+      </ul>
+    </div>
+
+  {% endunless %}
+
+</div>
+
+<style>
+  .section-id-{{ section.id }} .willstagram__overlay {
+    background-color: {{ section.settings.overlay_bg_color }};
+    color: {{ section.settings.overlay_text_color }};
+  }
+  .section-id-{{ section.id }} .willstagram__overlay .willstagram__mask {
+    background: linear-gradient(180deg,{{ section.settings.overlay_bg_color | color_modify: 'alpha', 0 }},{{ section.settings.overlay_bg_color | color_modify: 'alpha', 0 }} 70%,{{ section.settings.overlay_bg_color }});
+  }
+</style>
+
+
+{% schema %}
+  {
+    "name": "Instagram feed",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Instagram feed"
+      },
+      {
+        "type": "text",
+        "id": "access_token",
+        "label": "Access token",
+        "info": "Required - [get your access token](http:\/\/cleanthemes.co.uk\/pages\/instagram-integration)"
+      },
+      {
+        "type": "header",
+        "content": "Overlay"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_hover",
+        "label": "Show more details on hover",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "overlay_bg_color",
+        "label": "Background color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "overlay_text_color",
+        "label": "Text color",
+        "default": "#ffffff"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Instagram feed",
+        "category": "Social media",
+        "settings": {
+        }
+      }
+    ]
+  }
+{% endschema %}

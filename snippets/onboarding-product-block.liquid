@@ -1,0 +1,15 @@
+<div class="block product size-medium">
+  <div class="main">
+    <div class="img-link">
+      {% capture placeholder_svg_name %}product-{{ forloop.index0 | modulo: 6 | plus: 1 }}{% endcapture %}
+      <div class="placeholder-image">{{ placeholder_svg_name | placeholder_svg_tag }}</div>
+    </div>
+  </div>
+  
+  <div class="sub">
+    <span class="product-block-title">{{ 'onboarding.product.product_title' | t }}</span>
+    <div class="pricearea">
+      <span class="price theme-money">{{ 1234 | money }}</span>
+    </div>
+  </div>
+</div>

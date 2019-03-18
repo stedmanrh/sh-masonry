@@ -1,0 +1,118 @@
+<div id="crumbregion" class="double-padded">
+  <div class="nextprev">
+    {% if blog.previous_article %}
+    <a class="prev" href="{{ blog.previous_article }}">
+      {% include 'svg-chevron-left' %}
+      <span class="beside-img">{{ 'blogs.article.previous' | t }}</span>
+    </a>
+    {% endif %}
+    {% if blog.previous_article and blog.next_article %}
+    <span class="divider">|</span>
+    {% endif %}
+    {% if blog.next_article %}
+    <a class="text" href="{{ blog.next_article }}">
+      <span class="beside-img">{{ 'blogs.article.next' | t }}</span>
+      {% include 'svg-chevron-right' %}
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="crumbs desktop-only">
+    <a class="first" href="{{ blog.url }}" title="{{ blog.title }}">
+      {% include 'svg-chevron-left' %}
+      <span class="beside-img">{{ blog.title }}</span>
+    </a>
+    <span class="social-links">
+      <a class="rss" href="{{ blog.url }}.atom" title="{{ blog.title | escape }} RSS">{% include 'svg-rss' %}</a>
+    </span>
+  </div>
+</div>
+
+
+{% section 'article-template' %}
+
+
+{% if blog.comments_enabled? %}
+{% paginate article.comments by 100 %}
+{% if article.comments != blank %}
+<div id="comments" class="reading-container">
+  <h2>{{ 'blogs.comments.title' | t }}</h2>
+
+  {% comment %} Loop through approved comments: {% endcomment %}        
+  {% for comment in article.comments reversed %}
+  <div class="inner-row cf light-border-under match-padding-above">
+    <div class="gravatar">
+      <img src="//www.gravatar.com/avatar/{{ comment.email | remove: ' ' | strip_newlines | downcase | md5 }}?d=https:{{ 'gravatar_def.png' | asset_url | url_escape }}" alt="{{ comment.author }}" />
+    </div>
+
+    <div class="comment">
+      <p>{{ 'blogs.comments.author_meta' | t: author: comment.author }}</p>
+      <div>{{ comment.content }}</div>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% comment %} Show a comment that was *just* submitted {% endcomment %}
+  {% if comment and comment.created_at and blog.moderated == false %}
+  <div class="inner-row cf">
+    <div class="gravatar">
+      <img src="//www.gravatar.com/avatar/{{ comment.email | remove: ' ' | strip_newlines | downcase | md5 }}?d=https:{{ 'gravatar_def.png' | asset_url | url_escape }}" alt="{{ comment.author }}" />
+    </div>
+
+    <div class="comment">
+      <p>{{ 'blogs.comments.author_meta' | t: author: comment.author }}</p>
+      <div>{{ comment.content }}</div>
+    </div>
+  </div>
+  {% endif %}
+</div> <!-- /#comments -->
+
+{% if paginate.pages > 1 %}
+<div class="reading-container">
+  {% include 'pagination-control' %} 
+</div>
+{% endif %}
+{% endif %}
+{% endpaginate %}  
+
+<div class="reading-container reading-container--form form">
+  {% form article %}
+  <h2 id="add-comment-title">{{ 'blogs.comments.form_title' | t }}</h2>
+
+  {% if form.posted_successfully? %}
+  <p>{{ 'blogs.comments.success' | t }}</p>
+  {% endif %}
+
+  {% if blog.moderated? %}
+  <p>{{ 'blogs.comments.moderated' | t }}</p>
+  {% endif %}
+
+  {% if form.errors %}
+  <ul class="error">
+    {% for field in form.errors %}
+    <li>{{ field | capitalize }} {{ form.errors.messages[field] }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="inputrow{% if form.errors contains 'author' %} has-error{% endif %}">
+    <label for="comment_author">{{ 'blogs.comments.name' | t }} <span class="req">*</span></label>
+    <input type="text" id="comment_author" name="comment[author]" size="40" value="{{form.author}}" />
+  </div>
+  <div class="inputrow{% if form.errors contains 'email' %} has-error{% endif %}">
+    <label for="comment_email">{{ 'blogs.comments.email' | t }} <span class="req">*</span></label>
+    <input type="text" id="comment_email" name="comment[email]" size="40" value="{{form.email}}" />
+  </div>
+  <div class="inputrow{% if form.errors contains 'body' %} has-error{% endif %}">
+    <label for="comment_body">{{ 'blogs.comments.message' | t }} <span class="req">*</span></label>
+    <textarea id="comment_body" name="comment[body]" cols="40" rows="5">{{form.body}}</textarea>
+  </div>
+
+  <div class="buttonrow">
+    <input type="submit" value="{{ 'blogs.comments.post' | t }}" id="comment-submit" class="btn" />
+  </div>
+
+  {% endform %}
+</div> <!-- /.form -->
+    
+{% endif %}

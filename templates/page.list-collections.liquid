@@ -1,0 +1,13 @@
+<div class="content-header align-centre">
+  <h1 class="page-title">{{ page.title | escape }}</h1>
+</div>
+
+{% if page.content != blank %}
+<div class="reading-container rte align-centre">{{ page.content }}</div>
+{% endif %}
+
+<div class="blocklayout list-collections">
+  {% for link in linklists[page.handle].links %}
+  {% include 'collection-block', collection: link.object %}
+  {% endfor %}
+</div>

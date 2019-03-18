@@ -1,0 +1,70 @@
+{% comment %}
+Example of use:
+
+{% include 'product-block', product_collection: collection %}
+
+{% endcomment %}
+
+{% assign block_size = 'medium' %}
+{% if product.tags contains 'meta-image-large' %}
+{% unless product_image_size_norm %}
+{% assign block_size = 'large' %}
+{% endunless %}
+{% endif %}
+
+{% include 'product-label' with product %}
+
+{% unless no_quick_buy %}{% assign no_quick_buy = false %}{% endunless %}
+
+{% assign collection_colour_class = '' %}
+
+{% if product_collection %}
+    {% capture product_url %}{{ product.url | within: product_collection }}{% endcapture %}
+{% else %}
+    {% capture product_url %}{{ product.url }}{% endcapture %}
+{% endif %}
+<div class="block product size-{{ block_size }} {% if settings.adv_ratio %}fixed-ratio{% endif %}">
+  <div class="main">
+    <a class="img-link" href="{{ product_url }}" title="{{ product.title | escape }}">
+      {{ label }}
+      {% if settings.adv_ratio %}
+        {% capture aspect_ratio_to_use %}{% if settings.prod_thumb_img_ratio == 'tallest' or settings.prod_thumb_img_ratio == 'shortest' %}{{ calculated_aspect_ratio | default: product.featured_image.aspect_ratio }}{% else %}{{ product.featured_image.aspect_ratio }}{% endif %}{% endcapture %}
+        <div class="rimage-outer-wrapper lazyload fade-in rimage-bg-fit"
+            data-bgset="{% include 'bgset', image: product.featured_image %}"
+            data-sizes="auto"
+            data-parent-fit="cover">
+          <div class="rimage-wrapper" style="padding-top:{{ 1 | divided_by: aspect_ratio_to_use | times: 100 }}%">
+            <noscript>
+              <img src="{{ product.featured_image | img_url: '1024x1024' }}" alt="{{ product.featured_image.alt | escape }}" class="rimage__image">
+            </noscript>
+          </div>
+        </div>
+      {% else %}
+        {% include 'responsive-image', image: product.featured_image %}
+      {% endif %}
+    </a>
+
+    {% if settings.prod_block_qv and no_quick_buy == false %}
+    <div class="quick-buy-row">
+      <a href="{{ product_url }}?view=lightbox" class="quick-buy button button--slim">{{ 'products.listing.quick_view' | t }}</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="sub">
+    <a class="product-block-title" href="{{ product_url }}">{{ product.title }}</a>
+    <div class="pricearea">
+      {% if product.price_varies %}<span class="from">{{ 'products.listing.from' | t }}</span>{% endif %}
+      <span class="price {% if product.compare_at_price > product.price %}price--reduced{% endif %} theme-money">{{ product.price | money }}</span>
+      {% if product.compare_at_price > product.price %}
+      <span class="was-price theme-money">{{ product.compare_at_price | money }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if settings.show_grid_reviews %}
+    <div class="themed-product-reviews">
+      <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+    </div>
+  {% endif %}
+</div>

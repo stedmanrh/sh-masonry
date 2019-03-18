@@ -1,0 +1,11 @@
+<div class="block product size-medium">
+  <div class="main">
+    <a class="img-link" href="#">
+      {% capture placeholder_svg_name %}collection-{{ forloop.index0 | modulo: 6 | plus: 1 }}{% endcapture %}
+      <div class="placeholder-image">{{ placeholder_svg_name | placeholder_svg_tag }}</div>
+    </a>
+  </div>
+  <div class="sub">
+    <p><a class="product-block-title" href="#">{{ 'onboarding.collection.collection_title' | t }}</a></p>
+  </div>
+</div>

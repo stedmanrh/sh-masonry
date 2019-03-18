@@ -1,0 +1,41 @@
+<div class="content-header">
+  <h1 class="page-title">{{ page.title }}</h1>
+</div>
+
+<div class="reading-container reading-container--form">
+  <div class="rte">{{ page.content }}</div>
+
+  <div class="form">
+    {% form 'contact' %}
+    {% if form.posted_successfully? %}
+    <p><strong>{{ 'contact.form.post_success' | t }}</strong></p>
+    {% else %}
+
+    {% if form.errors %}
+    <ul>
+      {% for field in form.errors %}
+      <li class="error">{{ field | replace: 'body','Message' | capitalize }} - {{ form.errors.messages[field] }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="inputrow{% if form.errors contains 'name' %} has-error{% endif %}">
+      <label for="contact_name" class="hoverlabel">{{ 'contact.form.name' | t }}</label>
+      <input type="text" data-fieldname="{{ 'contact.form.name' | t }}" class="required" id="contact_name" name="contact[name]" />
+    </div>
+    <div class="inputrow{% if form.errors contains 'email' %} has-error{% endif %}">
+      <label for="contact_email" class="hoverlabel">{{ 'contact.form.email' | t }}</label>
+      <input type="email" data-fieldname="{{ 'contact.form.email' | t }}" class="required" id="contact_email" class="email" name="contact[email]" />
+    </div>
+    <div class="inputrow{% if form.errors contains 'body' %} has-error{% endif %}">
+      <label for="message" class="hidden">{{ 'contact.form.message' | t }}</label>
+      <textarea id="message" data-fieldname="{{ 'contact.form.message' | t }}" class="required" name="contact[body]"></textarea>
+    </div>
+    <div class="buttonrow">
+      <input type="submit" class="button" value="{{ 'contact.form.send' | t }}" />
+    </div>
+
+    {% endif %}
+    {% endform %}
+  </div>
+</div>

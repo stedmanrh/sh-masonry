@@ -1,0 +1,309 @@
+{% assign product = all_products[section.settings.product]  %}
+
+{% assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image %}
+
+<div class="section-id-{{ section.id }}" data-section-type="featured-product">
+  <div class="product-container spacey-row cf">
+    {% if product != blank %}
+<style type="text/css">
+@media (min-width: 768px) {
+  {% for image in product.images %}
+    .section-id-{{ section.id }} .product-gallery__image-{{ forloop.index }} {
+        width: calc(400px * {{ image.aspect_ratio }});
+    }
+  {% endfor %}
+}
+</style>
+      <div class="product-gallery {% if product.images.size == 1 or section.settings.show_all_images == false %}single-image{% endif %}">
+        <div class="swiper-container gallery-top">
+          <div class="swiper-wrapper">
+            {% if section.settings.show_all_images %}
+              {% assign image_limit = product.images.size %}
+            {% else %}
+              {% assign image_limit = 1 %}
+            {% endif %}
+            {% for image in product.images limit: image_limit %}
+            <div class="swiper-slide" {% if featured_image == image %}data-featured="true"{% endif %}>
+              <a class="product-gallery__image product-gallery__image-{{ forloop.index }}" href="{{ image | product_img_url: '2048x' }}" title="{{ image.alt | escape }}" data-full-size-src="{{ image | product_img_url: 'master' }}">
+                {% include 'responsive-image', image: image %}
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-button-prev">{% include 'svg-chevron-left-light' %}</div>
+          <div class="swiper-button-next">{% include 'svg-chevron-right-light' %}</div>
+        </div>
+      </div><!-- /.product-gallery -->
+
+      <div class="product-info">
+        <div class="inner">
+            {% include 'product-label' with product %}
+            <div class="majorinfo {% if label != '' %} haslabel{% endif %}">
+              {{ label }}
+
+              <h1 class="product-title">{{ product.title }}</h1>
+
+              <div class="pricearea">
+                {% if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %}
+                <span class="was-price theme-money">{{ product.selected_or_first_available_variant.compare_at_price | money }}</span>
+                {% endif %}
+                <span class="price theme-money">{{ product.selected_or_first_available_variant.price | money }}</span>
+              </div>
+
+              <div class="product-classification">
+                {% if section.settings.prod_show_vendor %}
+                {% comment %}
+                Do we have a collection that has the same name as our product vendor name?
+                If we do, let's have the vendor link point to it.
+                If not, we will point to the automatic vendor collection.
+                {% endcomment %}
+                {% assign product_vendor_handle = product.vendor | handle %}
+                {% if collections[product_vendor_handle].handle == product_vendor_handle %}
+                {% assign vendor_url = collections[product_vendor_handle].url %}
+                {% else %}
+                {% assign vendor_url = product.vendor | url_for_vendor %}
+                {% endif %}
+                <div class="vendor">{{ 'products.product.vendor' | t }} <span>{{ product.vendor | link_to: vendor_url }}</span></div>
+                {% endif %}
+
+                {% if section.settings.prod_show_sku %}
+                <div class="sku {% if product.selected_or_first_available_variant.sku == blank %}sku--no-sku{% endif %}">{{ 'products.product.sku' | t }} <span class="sku__value">{{ product.selected_or_first_available_variant.sku }}</span></div>
+                {% endif %}
+              </div>
+            </div>
+            {% if product.available %}
+            {% form 'product', product, class: 'product-form', data-product-id: product.id, data-ajax: section.settings.enable_ajax_add %}
+              <div class="productoptions section">
+                {% if product.variants.size > 1 %}
+                <div class="inputrow">
+
+                  <div class="option-selectors">
+                    {% for option in product.options_with_values %}
+                    <div class="selector-wrapper cf">
+                      <label {% if option.name == 'default' %}class="hidden"{% endif %} for="option-{{ option.name | handle }}">
+                        {{ option.name }}
+                      </label>
+                      <select id="option-{{ option.name | handle }}">
+                        {% for value in option.values %}
+                        <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>
+                          {{ value }}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    {% endfor %}
+                  </div>
+
+                  <select name="id" class="original-selector">
+                    {% for variant in product.variants %}
+                    <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %} selected="selected"{% endif %} data-stock="{% if variant.inventory_management == 'shopify' and variant.inventory_quantity <= 0 %}out{% endif %}">{{ variant.title | escape }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                {% else %}
+                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" />
+                {% endif %}
+
+                <div class="{% if section.settings.enable_payment_button %}with-payment-button{% endif %}">
+                  {% if section.settings.enable_payment_button %}
+                    {% if section.settings.show_quantity %}
+                      <div>
+                        <label for="quantity">{{ 'products.product.quantity' | t }}</label>
+                        <input class="quantity" type="text" name="quantity" value="1" size="2" />
+                      </div>
+                    {% else %}
+                      <input type="hidden" name="quantity" value="1" />
+                    {% endif %}
+                    <button type="submit" name="add" class="add-to-cart button button--alt">{{ 'products.product.add_to_cart' | t }}</button>
+                    {{ form | payment_button }}
+                  {% else %}
+                    {% if section.settings.show_quantity %}
+                      <label for="quantity">{{ 'products.product.quantity' | t }}</label>
+                      <div class="quantadd">
+                        <input class="quantity" type="text" name="quantity" value="1" size="2" />
+                        <button type="submit" name="add" class="add-to-cart button">{{ 'products.product.add_to_cart' | t }}</button>
+                      </div>
+                    {% else %}
+                      <input type="hidden" name="quantity" value="1" />
+                      <button type="submit" name="add" class="add-to-cart button">{{ 'products.product.add_to_cart' | t }}</button>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div><!-- /.options -->
+
+              {% if product.variants.size == 1 %}
+              {% if product.variants.first.inventory_management == 'shopify' and product.variants.first.inventory_quantity < 1 %}
+              <div class="backorder">
+                <p><span class="selected-variant">{{ product.title }}</span> {{ 'products.product.backorder' | t }}</p>
+              </div>
+              {% endif %}
+              {% else %}
+              <div class="backorder hidden">
+                <p><span class="selected-variant"></span> {{ 'products.product.backorder' | t }}</p>
+              </div>
+              {% endif %}
+            {% endform %}
+
+          {% else %}
+          <p>{{ 'products.product.product_unavailable' | t }}</p>
+          {% endif %}
+
+          {% if section.settings.description != blank %}
+            <div class="description section">
+              {{ section.settings.description }}
+            </div>
+          {% endif %}
+
+          {% capture full_details %}{{ 'products.listing.full_details' | t }} <span class="icon-arrow3-right"></span>{% endcapture %}
+          <div class="section"><a href="{{ product.url }}">{{ full_details }}</a></div>
+        </div>
+      </div><!-- /.product-info -->
+
+    {% else %}
+
+      <div class="product-gallery {% unless section.settings.show_all_images %}single-image{% endunless %}">
+        <div class="swiper-container gallery-top">
+          <div class="swiper-wrapper">
+            {% if section.settings.show_all_images %}
+              {% assign image_limit = 4 %}
+            {% else %}
+              {% assign image_limit = 1 %}
+            {% endif %}
+            {% for i in (1..image_limit) %}
+            <div class="swiper-slide">
+              <div class="product-gallery__image product-gallery__image-{{ forloop.index }}" style="width: 400px">
+                {% capture placeholder_svg_name %}product-{{ forloop.index0 | modulo: 6 | plus: 1 }}{% endcapture %}
+                <div class="placeholder-image">{{ placeholder_svg_name | placeholder_svg_tag }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-button-prev">{% include 'svg-chevron-left-light' %}</div>
+          <div class="swiper-button-next">{% include 'svg-chevron-right-light' %}</div>
+        </div>
+      </div><!-- /.product-gallery -->
+
+      <div class="product-info">
+          <div class="inner">
+            <div class="majorinfo">
+              <h1 class="product-title">{{ 'onboarding.product.product_title' | t }}</h1>
+
+              <div class="pricearea">
+                <span class="was-price theme-money">{{ 2999 | money }}</span>
+                <span class="price theme-money">{{ 1999 | money }}</span>
+              </div>
+
+              <div class="product-classification">
+                {% if section.settings.prod_show_vendor %}
+                <div class="vendor">{{ 'products.product.vendor' | t }} <span><a href="#">{{ 'onboarding.product.vendor' | t }}</a></span></div>
+                {% endif %}
+
+                {% if section.settings.prod_show_sku %}
+                <div class="sku">{{ 'products.product.sku' | t }} <span class="sku__value">{{ 'onboarding.product.sku' | t }}</span></div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="product-form">
+              <div class="productoptions section">
+                <div>
+                  {% if section.settings.show_quantity %}
+                    <label for="quantity">{{ 'products.product.quantity' | t }}</label>
+
+                    <div class="quantadd">
+                      <input id="quantity" name="quantity" value="1" size="2" />
+                      <button type="submit" name="add" id="add-to-cart">{{ 'products.product.add_to_cart' | t }}</button>
+                    </div>
+                  {% else %}
+                    <button type="submit" name="add" id="add-to-cart">{{ 'products.product.add_to_cart' | t }}</button>
+                  {% endif %}
+                </div>
+              </div><!-- /.options -->
+            </div>
+
+            {% if section.settings.description != blank %}
+              <div class="description section">
+                {{ section.settings.description }}
+              </div>
+            {% endif %}
+
+            {% capture full_details %}{{ 'products.listing.full_details' | t }} <span class="icon-arrow3-right"></span>{% endcapture %}
+            <div class="section"><a href="#">{{ full_details }}</a></div>
+          </div>
+      </div><!-- /.product-info -->
+
+    {% endif %}
+  </div><!-- /.product-container -->
+
+</div>
+
+{% if product != blank %}
+<script type="application/json" id="ProductJson-{{ product.id }}">
+  {{ product | json }}
+</script>
+{% endif %}
+
+
+{% schema %}
+  {
+    "name": "Featured product",
+    "settings": [
+      {
+        "type": "product",
+        "id": "product",
+        "label": "Product"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_all_images",
+        "label": "Show all images",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "prod_show_sku",
+        "label": "Show SKU",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "prod_show_vendor",
+        "label": "Show vendor",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_quantity",
+        "label": "Show quantity",
+        "default": false
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_ajax_add",
+        "label": "Stay on the current page, when adding to cart",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_payment_button",
+        "label": "Show dynamic checkout button",
+        "info": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+        "default": true
+      }
+    ],
+    "presets": [
+      {
+        "name": "Featured product",
+        "category": "Product",
+        "settings": {
+        }
+      }
+    ]
+  }
+{% endschema %}

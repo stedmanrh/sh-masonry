@@ -1,0 +1,11 @@
+{%- assign ratio = products.first.featured_image.aspect_ratio -%}
+{%- if type == 'tallest' -%}
+  {%- for product in products offset: 1 -%}
+    {%- if product.featured_image.aspect_ratio < ratio -%}{%- assign ratio = product.featured_image.aspect_ratio -%}{%- endif -%}
+  {%- endfor -%}
+{%- else -%}
+  {%- for product in products offset: 1 -%}
+    {%- if product.featured_image.aspect_ratio > ratio -%}{%- assign ratio = product.featured_image.aspect_ratio -%}{%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{{ ratio }}

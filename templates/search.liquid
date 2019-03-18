@@ -1,0 +1,86 @@
+{% paginate search.results by 20 %}
+
+<div class="content-header">
+  <h1 class="page-title align-center">{{ 'general.search.title' | t }}</h1>
+
+  <form class="row" id="search-form" name="search" action="/search">
+    <div class="inline-input-button-row">
+      <div class="inline-input-button-row__input">
+        <input type="text" id="q" name="q" placeholder="{{ 'general.search.page_placeholder' | t }}" value="" />
+      </div>
+      <div class="inline-input-button-row__button">
+        <input type="submit" id="search-submit" value="{{ 'general.search.submit' | t }}" />
+      </div>
+    </div>
+    <input type="hidden" name="type" value="{{ settings.search_type }}" />
+  </form>
+
+  {% if search.performed %}
+  {% if search.results != empty %}
+  <div class="h3 align-center">{{ 'general.search.your_search_html' | t: terms: search.terms }}, {{ 'general.search.results_with_count' | t: count: search.results_count }}</div>
+  {% else %}
+  <div class="h3 align-center">{{ 'general.search.no_results_html' | t: terms: search.terms }}</div>
+  {% endif%}
+  {% endif %}
+</div>
+
+
+{% if search.performed %}
+<div class="row cf">
+  {% include 'pagination-control' %}
+</div>
+{% endif %}
+
+<div class="blocklayout search-results" data-results-total="{{ paginate.items }}">
+  {% if search.performed %}
+    {% if search.results != empty %}
+
+      {%- if settings.adv_ratio -%}
+      {%- assign ratio = 999 -%}
+        {%- for item in search.results -%}
+          {%- if item.object_type == 'product' -%}
+            {%- if ratio == 999 -%}
+              {%- assign ratio = item.featured_image.aspect_ratio -%}
+            {%- else -%}
+              {%- if settings.prod_thumb_img_ratio == 'tallest' -%}
+                {%- if item.featured_image.aspect_ratio < ratio -%}{%- assign ratio = item.featured_image.aspect_ratio -%}{%- endif -%}
+              {%- else -%}
+                {%- if item.featured_image.aspect_ratio > ratio -%}{%- assign ratio = item.featured_image.aspect_ratio -%}{%- endif -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- capture calculated_aspect_ratio -%}{{ ratio }}{%- endcapture -%}
+      {%- endif -%}
+
+      {% for item in search.results %}
+        {% if item.object_type == 'product' %}
+          {% assign product = item %}
+          {% include 'product-block' with item, product_collection: false, product_image_size_norm: true, calculated_aspect_ratio: calculated_aspect_ratio %}
+        {% else %}
+          <div class="block text size-large">
+            <div class="main">
+              {% if item.object_type == 'article' and item.image %}
+              <p class="image">{{ item.image | img_url: '1024x1024' | img_tag | link_to: item.url }}</p>
+              {% endif %}
+
+              <h2 class="search-result-title">{{ item.title }}</h2>
+              <p class="search-result-description">{{ item.content | strip_html | truncatewords: 40 | highlight: search.terms }}</p>
+            </div>
+            <div class="sub">
+              <a class="cta-link" href="{{ item.url }}">{{ 'general.search.read_more' | t }}</a>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+</div>
+
+{% if search.performed and search.results != empty %}
+<div class="row cf">
+  {% include 'pagination-control' %}
+</div>
+{% endif %}
+
+{% endpaginate %}

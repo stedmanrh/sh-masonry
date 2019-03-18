@@ -1,0 +1,26 @@
+<div class="reading-container reading-container--form">
+  <h1 class="page-title">{{ 'customer.activate_account.title' | t }}</h1>
+
+  <p class="note">{{ 'customer.activate_account.subtext' | t }}</p>
+
+  <div class="form">
+    {% form 'activate_customer_password' %}
+    {{ form.errors | default_errors }}
+
+    <div id="password" class="inputrow">
+      <label class="large" for="password">{{ 'customer.activate_account.password' | t }}</label>
+      <input type="password" value="" name="customer[password]" id="customer_password" class="large password" size="16" />
+    </div>
+    <div id="password_confirm" class="inputrow">
+      <label class="large" for="password_confirmation">{{ 'customer.activate_account.password_confirm' | t }}</label>
+      <input type="password" value="" name="customer[password_confirmation]" id="customer_password_confirmation" class="large password" size="16" />
+    </div>
+    <div class="buttonrow">
+      <p>
+        <input class="btn" type="submit" value="{{ 'customer.activate_account.submit' | t }}" />
+      </p>
+      <input type="submit" class="btn cancel" name="decline" id="customer_decline" value="{{ 'customer.activate_account.cancel' | t }}" />
+    </div>
+    {% endform %}
+  </div>
+</div>

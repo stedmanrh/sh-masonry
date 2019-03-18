@@ -1,0 +1,344 @@
+{% if template == 'gift_card' %}
+
+{% comment %} Gift card template logo {% endcomment %}
+<div class="shoplogo {% if section.settings.use_logo_margin %}with-margin{% endif %}">
+  <a href="{{ shop.url }}" title="{{ shop.name }}">
+    {% if section.settings.logo %}
+    <span class="logoimg"><img src="{{ section.settings.logo | img_url: '480x' }}" alt="{{ shop.name }}" /></span>
+    {% else %}
+    <span class="logotext">{{ shop.name }}</span>
+    {% endif %}
+  </a>
+</div>
+
+{% else %}
+
+<style>
+  {% if section.settings.nav_featured_link != blank %}
+  .mainnav .featured-link,
+  .mainnav .featured-link:hover,
+  .nav-outside-expanded-mode .mainnav .tier2 .featured-link,
+  .nav-outside-expanded-mode .mainnav .tier2 .featured-link:hover {
+    color: {{ section.settings.nav_featured_col }};
+  }
+  {% endif %}
+
+  {% for block in section.blocks %}
+  .special-link--{{ forloop.index }} {
+    background: {{ block.settings.background_color }};
+    color: {{ block.settings.text_color }};
+  }
+  {% endfor %}
+</style>
+<div data-section-type="header-section">
+
+  <div class="page-header cf {% if section.settings.header_full_width %}page-header--full-width{% endif %}">
+    <div class="page-header__inner">
+      <a class="nav-toggle" href="#">{% include 'svg-nav' %}</a>
+
+      <div class="shoplogo {% if section.settings.use_logo_margin %}with-margin{% endif %}">
+        <a href="/" title="{{ shop.name }}">
+          {% if section.settings.logo %}
+          <span class="logoimg"><img src="{{ section.settings.logo | img_url: '480x' }}" alt="{{ shop.name }}" /></span>
+          {% else %}
+          <span class="logotext">{{ shop.name }}</span>
+          {% endif %}
+        </a>
+      </div>
+
+      {% if section.settings.show_store_message %}
+      <span class="store-message store-message--upper">
+        {% if section.settings.store_message_url != blank %}<a href="{{ section.settings.store_message_url }}">{% endif %}
+        {{ section.settings.store_message | escape }}
+        {% if section.settings.store_message_url != blank %}</a>{% endif %}
+      </span>
+      {% endif %}
+
+      {% if shop.customer_accounts_enabled %}
+      <span class="account-links">
+        {% if customer  %}
+        {{ 'layout.customer.account' | t | link_to: '/account' }} /
+        {{ 'layout.customer.log_out' | t | customer_logout_link }}
+        {% else %}
+        {{ 'layout.customer.log_in' | t | customer_login_link }} /
+        {{ 'layout.customer.register' | t | customer_register_link }}
+        {% endif %}
+      </span>
+      {% endif %}
+
+      <span class="search-and-cart">
+        <a class="search desktop-only" href="/search">{% include 'svg-search' %}</a>
+
+        <span class="cartsummary">
+          <span class="cartsummary__inner">
+            <a href="/{% if template != 'cart' or settings.cart_terms_show %}cart{% else %}checkout{% endif %}">
+              <span class="title">{{ 'layout.sidebar.cart' | t }}</span>
+              <span class="numitems">({{ cart.item_count }})</span>
+            </a>
+
+            <span class="desktop-only">
+              {% include 'currencies-switcher' %}
+            </span>
+          </span>
+        </span>
+      </span>
+    </div>
+
+    <div class="quick-search">
+      <div class="row">
+        <div class="quick-search__input-row">
+          <form class="quick-search__form" name="search" action="/search">
+            <button type="submit" class="button plain quick-search__submit">{% include 'svg-search' %}</button>
+            <input class="quick-search__input" type="text" name="q" placeholder="{{ 'general.live_search.title' | t }}" value="" autocomplete="off" />
+            <input type="hidden" name="type" value="{{ settings.search_type }}" />
+            <a class="quick-search__close" href="#">{% include 'svg-close' %}</a>
+          </form>
+        </div>
+        <div class="quick-search__results">
+          <div class="quick-search__loader"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>
+          <div class="quick-search__results-items"></div>
+        </div>
+      </div>
+    </div>
+
+    {% if section.settings.show_store_message %}
+    <span class="store-message store-message--lower">
+      {% if section.settings.store_message_url != blank %}<a href="{{ section.settings.store_message_url }}">{% endif %}
+      {{ section.settings.store_message | escape }}
+      {% if section.settings.store_message_url != blank %}</a>{% endif %}
+    </span>
+    {% endif %}
+  </div>
+
+  <div id="navbar" class="nav-style-{{ section.settings.sidebar_submenu_style }} {% if section.settings.show_nav_shadow %}navbar--with-shadow{% endif %}" data-section-type="sidebar-section">
+    <div id="navpanel">
+      <div class="shoplogo {% if section.settings.use_logo_margin %}with-margin{% endif %}">
+        <a href="/" title="{{ shop.name }}">
+          {% if section.settings.logo %}
+          <span class="logoimg"><img src="{{ section.settings.logo | img_url: '480x' }}" alt="{{ shop.name }}" /></span>
+          {% else %}
+          <span class="logotext">{{ shop.name }}</span>
+          {% endif %}
+        </a>
+      </div>
+
+      <div class="mobile-only search-box">
+        <form name="search" action="/search">
+          <input type="hidden" name="type" value="{{ settings.search_type }}" />
+          <input type="text" name="q" placeholder="{{ 'general.search.sidebar_placeholder' | t }}" value="" />
+          <button type="submit" class="plain">{% include 'svg-search' %}</button>
+        </form>
+      </div>
+
+      {% assign featured_links = section.settings.nav_featured_link | split: ', ' | downcase %}
+      <div class="mainnav {% if section.settings.show_nav_dividers %}mainnav--with-dividers{% endif %}">
+        <div class="tier1" role="navigation" aria-label="{{ 'general.navigation.main_navigation_aria_label' | t | escape }}">
+          <a class="back" href="#" aria-controls="current-submenu" aria-label="{{ 'general.navigation.return' | t | escape }}" tabindex="-1">{% include 'svg-chevron-left' %}</a>
+          <ul>
+            {% for link in linklists[section.settings.menu_linklist].links %}
+            <li class="{% if link.active or link.child_active %}active{% endif %}{% if section.settings.sidebar_submenu_style == 'in' %}{% if link.child_active %} expanded{% endif %}{% endif %}">
+              {%- assign link_title_lower = link.title | downcase -%}
+              <a class="tier1title{% if featured_links contains link_title_lower %} featured-link{% endif %}" href="{{ link.url }}" {% if link.links != blank %}aria-haspopup="true"{% endif %}>{{ link.title }}</a>
+
+              {% if link.links != blank %}
+              <div class="tier2">
+                <div><div class="tier-title{% if featured_links contains link_title_lower %} featured-link{% endif %}">{{ link.title }}</div></div>
+                <ul>
+                  {% for child_link in link.links %}
+                  <li class="{% if child_link.active or child_link.child_active %}active{% endif %}{% if child_link.child_active and section.settings.sidebar_submenu_style == 'in' %} expanded{% endif %}">
+                    {%- assign child_link_title_lower = child_link.title | downcase -%}
+                    <a href="{{ child_link.url }}" {% if featured_links contains child_link_title_lower %}class="featured-link"{% endif %} {% if child_link.links != blank %}aria-haspopup="true"{% endif %} {% if child_link.child_active and section.settings.sidebar_submenu_style == 'in' %} aria-expanded="true"{% endif %}>{{ child_link.title }}</a>
+
+                    {% if child_link.links != blank %}
+                    <ul class="tier3">
+                      {% for child_child_link in child_link.links %}
+                      <li{% if child_child_link.active %} class="active"{% endif %}>
+                        {%- assign child_child_link_title_lower = child_child_link.title | downcase -%}
+                        <a href="{{ child_child_link.url }}" {% if featured_links contains child_child_link_title_lower %}class="featured-link"{% endif %}>{{ child_child_link.title }}</a>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                    {% endif %}
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+
+          {% if section.blocks.size > 0 %}
+            <ul class="special-links">
+              {% for block in section.blocks %}
+              <li class="special-link special-link--{{ forloop.index }}">
+                <a href="{{ block.settings.link }}">{{ block.settings.title }}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          {% if shop.customer_accounts_enabled %}
+          <div class="account-links">
+            {% if customer  %}
+            {{ 'layout.customer.account' | t | link_to: '/account' }} /
+            {{ 'layout.customer.log_out' | t | customer_logout_link }}
+            {% else %}
+            {{ 'layout.customer.log_in' | t | customer_login_link }} /
+            {{ 'layout.customer.register' | t | customer_register_link }}
+            {% endif %}
+          </div>
+          {% endif %}
+
+          {% if settings.show_multiple_currencies %}
+          <div class="mobile-only currency-switcher">
+            {% include 'currencies-switcher' %}
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <a class="quick-search-close-mask" href="#"></a>
+</div>
+{% endif %}
+
+
+{% schema %}
+  {
+    "name": "Header",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo",
+        "info": "240px wide (recommended)"
+      },
+      {
+        "type": "checkbox",
+        "id": "use_logo_margin",
+        "label": "Add margin to logo",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Navigation"
+      },
+      {
+        "type": "link_list",
+        "id": "menu_linklist",
+        "label": "Menu",
+        "default": "main-menu"
+      },
+      {
+        "type": "select",
+        "id": "sidebar_submenu_style",
+        "label": "Child navigation style",
+        "options": [
+          {
+            "value": "in",
+            "label": "Inside"
+          },
+          {
+            "value": "out",
+            "label": "Fly-out"
+          }
+        ],
+        "default": "in"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_nav_shadow",
+        "label": "Show shadow",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_nav_dividers",
+        "label": "Show dividers between links",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "nav_featured_link",
+        "label": "Featured link",
+        "info": "Enter the title of a link to highlight it in a different color",
+        "default": "Sale"
+      },
+      {
+        "type": "color",
+        "id": "nav_featured_col",
+        "label": "Featured link color",
+        "default": "#dd6666"
+      },
+      {
+        "type": "header",
+        "content": "Header"
+      },
+      {
+        "type": "checkbox",
+        "id": "header_full_width",
+        "label": "Show full width",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Announcement"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_store_message",
+        "label": "Show",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "store_message",
+        "label": "Text"
+      },
+      {
+        "type": "url",
+        "id": "store_message_url",
+        "label": "Link"
+      }
+    ],
+    "max_blocks": 3,
+    "blocks": [
+      {
+        "type": "link",
+        "name": "Promotional link",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Text",
+            "default": "Promotional link"
+          },
+          {
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          },
+          {
+            "type": "color",
+            "id": "background_color",
+            "label": "Background color",
+            "default": "#666666"
+          },
+          {
+            "type": "color",
+            "id": "text_color",
+            "label": "Text color",
+            "default": "#ffffff"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

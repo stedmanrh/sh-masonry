@@ -1,0 +1,150 @@
+<div data-section-type="blog-template">
+  {% paginate blog.articles by 24 %}
+
+  <div class="content-header align-centre has-rss">
+    <span class="social">
+      <a class="rss" href="{{ blog.url }}.atom" title="{{ blog.title | escape }} RSS">{% include 'svg-rss' %}</a>
+    </span>
+
+    <h1 class="page-title">{{ blog.title }}</h1>
+  </div>
+
+  {% if blog.tags.size > 0 %}
+  <div class="filter-row row cf">
+    <div class="filter-group filter-group--start-hidden">
+      <div class="filter-header">
+        <a class="filter-toggle" href="#">
+          {{ 'blogs.filtering.filter' | t }}
+          {% include 'svg-chevron-down' %}
+        </a>
+
+        {% capture close_replace_html %} {% include 'svg-close' %}{{'</a>'}}{% endcapture %}
+        <span class="filter-header__current-tags">
+          {% for tag in current_tags %}
+          {{ tag | link_to_remove_tag: tag | replace: '</a>', close_replace_html }}
+          {% endfor %}
+
+          {% if current_tags %}
+          <a class="clear-tags" href="/blogs/{{ blog.handle }}">
+            {{ 'blogs.filtering.clear_all' | t }} {% include 'svg-close' %}
+          </a>
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="filter-items">
+        <div class="filter filter--tags align-centre">
+          {% for tag in blog.all_tags %}
+          {{ tag | link_to_add_tag: tag }}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row cf align-right">
+    {% include 'social-sharing' with blog %}
+  </div>
+
+  {% if blog.articles.size > 0 %}
+
+  {% unless section.settings.display_mode_list %}
+  <div class="blocklayout double-sized" data-block-width="{{ section.settings.block_width_int }}">
+    {% endunless %}
+
+    {% for article in blog.articles %}
+    <div class="{% if section.settings.display_mode_list %}row{% else %}block{% endif %} text">
+      <div class="main">
+        {% if article.image %}
+        <div class="article-image">
+          <a href="{{ article.url }}">
+            {% include 'responsive-image', image: article.image %}
+          </a>
+        </div>
+        {% endif %}
+
+        <div class="meta">
+          {% if section.settings.show_author %}
+          <span class="meta-item">{{ article.author | escape }}</span>
+          {% endif %}
+          <span class="meta-item">{{ article.published_at | date: format: 'month_date_year' }}</span>
+        </div>
+
+        <h2>{{ article.title | link_to: article.url }}</h2>
+
+        <div class="rte article-excerpt">{{ article.excerpt_or_content }}</div>
+
+        <p class="fullarticle"><a class="cta-link" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a></p>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% unless section.settings.display_mode_list %}
+  </div>
+  {% endunless %}
+
+  <div class="row">
+    {% include 'pagination-control' %}
+  </div>
+
+  {% else %}
+
+  <div class="reading-container rte align-centre">{{ 'blogs.general.no_matches' | t }}</div>
+
+  {% endif %}
+
+  {% endpaginate %}
+</div>
+
+<style type="text/css">
+  .blocklayout.double-sized .block {
+    margin: {{ section.settings.block_gut_int }}px;
+    width: {{ section.settings.block_width_int | plus: section.settings.block_width_int | plus: section.settings.block_gut_int | plus: section.settings.block_gut_int }}px;
+  }
+</style>
+
+
+{% schema %}
+  {
+    "name": "Blog pages",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "display_mode_list",
+        "label": "Enable list layout",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_author",
+        "label": "Show author"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "range",
+        "id": "block_width_int",
+        "min": 150,
+        "max": 350,
+        "step": 50,
+        "unit": "px",
+        "label": "Tile size",
+        "default": 250,
+        "info": "Tile size may increase to fill the page"
+      },
+      {
+        "type": "range",
+        "id": "block_gut_int",
+        "min": 10,
+        "max": 20,
+        "step": 5,
+        "unit": "px",
+        "label": "Margin between tiles",
+        "default": 15
+      }
+    ]
+  }
+{% endschema %}

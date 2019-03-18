@@ -1,0 +1,83 @@
+<div data-section-type="featured-collection">
+  {% assign collection = collections[section.settings.collection] %}
+
+  {% unless collection == blank %}
+
+  <div class="spacey-row align-center">
+    <h1><a href="{{ collection.url }}">{{ section.settings.title | escape }}</a></h1>
+  </div>
+
+  {%- if collection.products != blank and settings.adv_ratio -%}
+    {%- capture calculated_aspect_ratio -%}{% include 'minmax-image-ratio', products: collection.products, type: settings.prod_thumb_img_ratio == 'tallest' %}{%- endcapture -%}
+  {%- endif -%}
+
+  <div class="blocklayout" data-row-limit="{{ section.settings.row_count }}">
+    {% for product in collection.products %}
+      {% include 'product-block' with product, product_collection: collection, calculated_aspect_ratio: calculated_aspect_ratio %}
+    {% endfor %}
+  </div>
+
+  {% else %}
+
+  <div class="spacey-row align-center">
+    <h1>{{ section.settings.title }}</h1>
+  </div>
+
+  <div class="blocklayout" data-row-limit="{{ section.settings.row_count }}">
+    {% for i in (1..12) %}
+      {% include 'onboarding-product-block' %}
+    {% endfor %}
+  </div>
+
+  {% endunless %}
+</div>
+
+{% schema %}
+  {
+    "name": "Featured collection",
+    "class": "index-section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Featured collection"
+      },
+      {
+        "type": "collection",
+        "id": "collection",
+        "label": "Collection"
+      },
+      {
+        "type": "select",
+        "id": "row_count",
+        "label": "Rows",
+        "options": [
+          {
+            "label": "1",
+            "value": "1"
+          },
+          {
+            "label": "2",
+            "value": "2"
+          },
+          {
+            "label": "3",
+            "value": "3"
+          },
+          {
+            "label": "No limit",
+            "value": ""
+          }
+        ],
+        "default": "1"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Featured collection",
+        "category": "Collection"
+      }
+    ]
+  }
+{% endschema %}

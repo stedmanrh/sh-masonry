@@ -23,7 +23,7 @@ $tablet-snap-width: 1000px;
 $product-gallery-fit-height: true; // limit gallery image to vertically fit inside window
 
 // Colouring
-$body-bg-col: #faf9f5;
+$body-bg-col: #ffffff;
 $base-text-col: #5d5d60;
 $heading-text-col: #212b36;
 $label-text-col: $heading-text-col;
@@ -31,15 +31,15 @@ $label-text-col: $heading-text-col;
 $link-text-col: #b3793b;
 $link-text-hover-col: darken($link-text-col, 10%);
 
-$page-header-bg-col: #212b36;
-$page-header-text-col: #faf9f5;
+$page-header-bg-col: #ffffff;
+$page-header-text-col: #212b36;
 
-$footer-bg-col: #faf9f5;
+$footer-bg-col: #ffffff;
 $footer-text-col: #212b36;
 
 $tinted-background: darken($body-bg-col, 5%);
 
-$sidebar-background-col: #faf9f5;
+$sidebar-background-col: #ffffff;
 $sidebar-text-col: #212b36;
 $sidebar-shadow: 0 0 15px 5px rgba(0,0,0,0.15);
 
@@ -1622,12 +1622,12 @@ html.no-js,
 }
 
 .shoplogo {
-  background: #faf9f5;
+  background: #ffffff;
   font-family: $logo-font-family;
   font-weight: $logo-font-weight;
   font-style: $logo-font-style;
   font-size: 20px;
-  line-height: 1.4em;
+  line-height: 1em;
   text-align: center;
 }
 
@@ -3054,11 +3054,21 @@ $social-icon-size: 16px;
   }
 
   .shoplogo {
-    display: none;
+    //display: none;
+
+    .logoimg {
+      margin: 0 auto;
+
+      @media(min-width: $tablet-snap-width) {
+        width: 360px;
+        position: relative;
+        top: -1em;
+      }
+    }
 
     .logotext {
-      margin-top: 20px;
-      margin-bottom: 20px;
+      // margin-top: 20px;
+      // margin-bottom: 20px;
       padding: 0;
       text-align: center;
       font-size: 80%;
@@ -3152,7 +3162,7 @@ $social-icon-size: 16px;
 
     .page-header__inner {
       position: relative;
-      background: #faf9f5;
+      background: #ffffff;
       color: #212b36;
       svg {
         fill: #212b36;
@@ -4739,4 +4749,3 @@ $_video-play-button-size: 80px;
 /*************    ---                   ---                   ---   *************/
 /*************    |     ENTER YOUR CUSTOM CODE BELOW HERE       |   *************/
 /*************    ---                   ---                   ---   *************/
-

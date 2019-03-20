@@ -1685,11 +1685,6 @@ $flyout-nav-speed: 250ms;
   overflow-y: auto;
   //NB: Scroll container must be position:static for fly-out to work in Safari.
   //    The fly-out must be positioned relative to its overflow-visible container.
-
-  .shoplogo {
-    visibility: hidden;
-    margin-bottom: 60px;
-  }
 }
 
 .mainnav {

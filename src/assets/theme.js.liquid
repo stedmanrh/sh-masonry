@@ -1816,9 +1816,9 @@ $(function($){
             indexToShow = index;
           }
         });
-        $.fancybox(imgs, { index: indexToShow, padding: 0 });
+        $.fancybox(imgs, { index: indexToShow, padding: 0, baseClass: 'sh-fancybox' });
       } else {
-        $.fancybox([{href: $(this).attr('href')}], { padding: 0 });
+        $.fancybox([{href: $(this).attr('href')}], { padding: 0, baseClass: 'sh-fancybox' });
       }
     }
   });

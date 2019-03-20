@@ -1507,10 +1507,60 @@ html.no-js,
 }
 
 .block.product .sub {
-  margin-top: $block-margin-under/2;
-  border-top: 1px solid $keyline-col;
+  {% comment %} margin-top: $block-margin-under/2;
+  border-top: 1px solid $keyline-col; {% endcomment %}
   padding: 1em 0 0;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  display: none;
+  box-sizing: border-box;
+  text-align: center;
+  padding-top: 50%;
+  margin-top: -1rem;
+  font-size: 2rem;
+  line-height: 2rem;
+  font-weight: bold;
+  color: white;
+}
+.block.product:hover .sub {
+  display: block;
+}
+
+#fancybox-overlay {
+  opacity: 1 !important;
+} 
+
+#fancybox-outer {
+  background-color: black;
+  opacity: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#fancybox-wrap {
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed;
+    top: 0 !important;
+    left: 0 !important;
+    background-color: black;
+    opacity: 1;
+    padding: 0;
+}
+
+#fancybox-content {
+  {% comment %} height: 100% !important;
+  width: 100% !important; {% endcomment %}
+  background-color: black;
+}
+#fancybox-img {
+  {% comment %} width: auto; {% endcomment %}
 }
 
 .block.product .themed-product-reviews {
@@ -2378,7 +2428,8 @@ $social-icon-size: 16px;
 }
 
 .product-block-title {
-  color: $heading-text-col;
+  display: none;
+  {% comment %} color: $heading-text-col; {% endcomment %}
 }
 
 .collection-sorter {
@@ -4295,6 +4346,19 @@ $instagram-gutter-mobile: $block-padding;
 .rimage-bg-fill {
   background-size: cover;
 }
+.alt-image {
+    display: none
+  }
+
+  .main-image:hover ~ .alt-image {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+  }
 .rimage-wrapper {
   position: relative;
 

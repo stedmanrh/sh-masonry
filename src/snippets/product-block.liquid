@@ -14,7 +14,7 @@ Example of use:
 
 {% include 'product-label' with product %}
 
-{% unless no_quick_buy %}{% assign no_quick_buy = false %}{% endunless %}
+{% unless no_quick_buy %}{% assign no_quick_buy = true %}{% endunless %}
 
 {% assign collection_colour_class = '' %}
 
@@ -40,7 +40,14 @@ Example of use:
           </div>
         </div>
       {% else %}
-        {% include 'responsive-image', image: product.featured_image %}
+        <div class="main-image">
+          {% include 'responsive-image', image: product.featured_image %}
+        </div>
+        {% if product.images[1] %}
+          <div class="alt-image">
+            {% include 'responsive-image', image: product.images[1] %}
+          </div>
+        {% endif %}
       {% endif %}
     </a>
 

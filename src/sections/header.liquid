@@ -36,6 +36,23 @@
     <div class="page-header__inner">
       <a class="nav-toggle" href="#">{% include 'svg-nav' %}</a>
 
+      <span class="search-and-cart">
+        <a class="search desktop-only" href="/search">{% include 'svg-search' %}</a>
+
+        <span class="cartsummary">
+          <span class="cartsummary__inner">
+            <a href="/{% if template != 'cart' or settings.cart_terms_show %}cart{% else %}checkout{% endif %}">
+              <span class="title">{{ 'layout.sidebar.cart' | t }}</span>
+              <span class="numitems">({{ cart.item_count }})</span>
+            </a>
+
+            <span class="desktop-only">
+              {% include 'currencies-switcher' %}
+            </span>
+          </span>
+        </span>
+      </span>
+
       <div class="shoplogo {% if section.settings.use_logo_margin %}with-margin{% endif %}">
         <a href="/" title="{{ shop.name }}">
           {% if section.settings.logo %}
@@ -66,22 +83,7 @@
       </span>
       {% endif %}
 
-      <span class="search-and-cart">
-        <a class="search desktop-only" href="/search">{% include 'svg-search' %}</a>
-
-        <span class="cartsummary">
-          <span class="cartsummary__inner">
-            <a href="/{% if template != 'cart' or settings.cart_terms_show %}cart{% else %}checkout{% endif %}">
-              <span class="title">{{ 'layout.sidebar.cart' | t }}</span>
-              <span class="numitems">({{ cart.item_count }})</span>
-            </a>
-
-            <span class="desktop-only">
-              {% include 'currencies-switcher' %}
-            </span>
-          </span>
-        </span>
-      </span>
+      
     </div>
 
     <div class="quick-search">

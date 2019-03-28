@@ -43,9 +43,9 @@
   </div>
   {% endif %}
 
-  <div class="row cf align-right">
+  <!--div class="row cf align-right">
     {% include 'social-sharing' with blog %}
-  </div>
+  </div-->
 
   {% if blog.articles.size > 0 %}
 
@@ -71,11 +71,11 @@
           <span class="meta-item">{{ article.published_at | date: format: 'month_date_year' }}</span>
         </div-->
 
-        <h2>{{ article.title | link_to: article.url }}</h2>
+        <!--h2>{{ article.title | link_to: article.url }}</h2>
 
         <div class="rte article-excerpt">{{ article.excerpt_or_content }}</div>
 
-        <p class="fullarticle"><a class="cta-link" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a></p>
+        <p class="fullarticle"><a class="cta-link" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a></p-->
       </div>
     </div>
     {% endfor %}

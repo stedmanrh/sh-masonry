@@ -1470,7 +1470,7 @@ theme.MasonryManager = new function(){
     var cols = 4; //Math.ceil(($masonry.width() - 200) / defWidth);
 
     //Min two per row on mobile (delete to go 1-a-row)
-    var isProductGrid = $masonry.find('.block:not(.product)').length == 0;
+    var isProductGrid = true; //$masonry.find('.block:not(.product)').length == 0;
     if(isProductGrid && $(window).width() < 768) {
       cols = 1; //Math.max(2, cols);
     }

@@ -1467,12 +1467,12 @@ theme.MasonryManager = new function(){
       baseWidth = parseInt($masonry.data('block-width'));
     }
     var defWidth = baseWidth * ($masonry.hasClass('double-sized')?2:1) + _.getBlockMargin($masonry) * 2;
-    var cols = Math.ceil(($masonry.width() - 200) / defWidth);
+    var cols = 4; //Math.ceil(($masonry.width() - 200) / defWidth);
 
     //Min two per row on mobile (delete to go 1-a-row)
     var isProductGrid = $masonry.find('.block:not(.product)').length == 0;
     if(isProductGrid && $(window).width() < 768) {
-      cols = Math.max(2, cols);
+      cols = 1; //Math.max(2, cols);
     }
 
     return Math.floor($masonry.width() / cols);

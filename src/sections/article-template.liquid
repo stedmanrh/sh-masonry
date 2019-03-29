@@ -1,5 +1,5 @@
 <div class="reading-container">
-  <h1 class="page-title">{{ article.title }}</h1>
+  <!--h1 class="page-title">{{ article.title }}</h1-->
 
   {% if article.image and section.settings.show_feat_img %}
   <div class="article-image">
@@ -7,19 +7,19 @@
   </div>
   {% endif %}
 
-  <p class="meta">
+  <!--p class="meta">
     {% if section.settings.show_author %}
     <span class="meta-item">{{ article.author | escape }}</span>
     {% endif %}
     <span class="meta-item">{{ article.published_at | date: format: 'month_date_year' }}</span>
-  </p>
+  </p-->
 
-  <div class="rte border-under">
+  <!--div class="rte border-under">
     {{ article.content }}
-  </div>
+  </div-->
 
   {% if article.tags.size > 0 %}
-  <div class="inner-row border-under">
+  <!--div class="inner-row border-under">
     <p class="in-page-tags">
       {{ 'blogs.article.tags' | t }}
       {% for tag in article.tags %}
@@ -27,7 +27,7 @@
       {% endfor %}
     </p>
     {% include 'social-sharing' with article %}
-  </div>
+  </div-->
   {% endif %}
 </div>
 

@@ -1472,7 +1472,7 @@ theme.MasonryManager = new function(){
     //Min two per row on mobile (delete to go 1-a-row)
     var isProductGrid = $masonry.find('.block:not(.product)').length == 0;
     if(isProductGrid && $(window).width() < 768) {
-      cols = Math.max(2, cols);
+      cols = 1; //Math.max(2, cols);
     }
 
     return Math.floor($masonry.width() / cols);

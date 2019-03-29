@@ -52,7 +52,7 @@
 
   <div class="product-container cf">
     <div class="product-gallery {% if product.images.size == 1 %}single-image{% endif %}">
-      <div class="swiper-container gallery-top">
+      <div class="swiper-container gallery-top swiper-container-vertical">
         <div class="swiper-wrapper">
           {% for image in product.images %}
           <div class="swiper-slide" {% if featured_image == image %}data-featured="true"{% endif %}>

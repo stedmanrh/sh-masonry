@@ -22,9 +22,9 @@
       {% include 'svg-chevron-left' %}
       <span class="beside-img">{{ blog.title }}</span>
     </a>
-    <span class="social-links">
+    {% comment %} <span class="social-links">
       <a class="rss" href="{{ blog.url }}.atom" title="{{ blog.title | escape }} RSS">{% include 'svg-rss' %}</a>
-    </span>
+    </span> {% endcomment %}
   </div>
 </div>
 

@@ -1,9 +1,9 @@
 <div data-section-type="collection-template">
   {% paginate collection.products by section.settings.coll_num_per_page_int %}
 
-  <div class="content-header align-centre">
+  {% comment %} <div class="content-header align-centre">
     <h1 class="page-title">{{ collection.title | escape }}</h1>
-  </div>
+  </div> {% endcomment %}
 
   {% if collection.description != blank %}
   <div class="reading-container rte align-centre">{{ collection.description }}</div>

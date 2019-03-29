@@ -68,11 +68,11 @@
         {{ powered_by_link }}
 
       </div>
-      <span class="payment-methods">
+      {% comment %} <span class="payment-methods">
         {% for type in shop.enabled_payment_types %}
           {{ type | payment_type_svg_tag: class: 'payment-icon' }}
         {% endfor %}
-      </span>
+      </span> {% endcomment %}
     </div>
   </div>
 </div>

@@ -6,7 +6,7 @@
       <a class="rss" href="{{ blog.url }}.atom" title="{{ blog.title | escape }} RSS">{% include 'svg-rss' %}</a>
     </span>
 
-    <h1 class="page-title">{{ blog.title }}</h1>
+    {% comment %} <h1 class="page-title">{{ blog.title }}</h1> {% endcomment %}
   </div>
 
   {% if blog.tags.size > 0 %}

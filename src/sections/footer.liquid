@@ -61,12 +61,7 @@
 
     <div class="page-footer__row page-footer__row-spacing">
       <div class="copy">
-        &copy; {{ "now" | date: "%Y" }} {{ shop.name | link_to: '/' }}.
-
-        {{ 'layout.footer.theme_by_html' | t }}
-
-        {{ powered_by_link }}
-
+        &copy; {{ "now" | date: "%Y" }} {{ shop.name | link_to: '/' }}   
       </div>
       {% comment %} <span class="payment-methods">
         {% for type in shop.enabled_payment_types %}

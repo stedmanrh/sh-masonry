@@ -53,7 +53,7 @@
   <div class="blocklayout double-sized" data-block-width="{{ section.settings.block_width_int }}">
     {% endunless %}
 
-    {% assign articles = blogs.articles | sort: 'title' %}
+    {% assign articles = blogs['lookbook-1'].articles | sort: 'title' %}
     {% for article in articles %}
     <div class="{% if section.settings.display_mode_list %}row{% else %}block{% endif %} text">
       <div class="main">

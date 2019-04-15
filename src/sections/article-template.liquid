@@ -17,7 +17,15 @@
   <div class="rte border-under">
     <div class="article-content">
       <img src="{{ article.image | img_url: 'master' }}">
-      {{ article.content }}
+      {% if article.content contains "<img" %}
+          {% assign content-src = article.content | split: 'src="' %}
+          {% assign content-size = content-src.size | minus:1 %}
+          {% for i in (1..content-size) %}
+              {% assign src = content-src[i] | split: '"' | first | replace: '//cdn', 'http://cdn' | replace: 'http:http://', 'http://' | remove: 'https:' %}
+              <img src="{{src}}" />
+          {% endfor %}
+     {% else %}
+     {% endif %}
     </div>
   </div>
 

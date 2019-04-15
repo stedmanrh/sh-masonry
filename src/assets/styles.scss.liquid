@@ -5430,3 +5430,13 @@ $_video-play-button-size: 80px;
 .shoplogo, .page-header {
   background: rgba(0,0,0,0);
 }
+
+.article-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+
+  @media(max-width: 425px){
+    grid-template-columns: 1fr;
+  }
+}
